@@ -65,3 +65,10 @@ blockquote {
 	margin: 0px;
 	font-style: italic;
 }
+hr {
+	border: 0;
+	border-top: 1px solid #eee;
+	margin: 20px 0px;
+	height: 120px;
+	background: linear-gradient(#eee, transparent)
+}
