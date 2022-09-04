@@ -1,5 +1,6 @@
 .hero-image {
   max-height: 30vh;
   object-fit: cover;
-  border-top-left-radius: 32px;
+  border-radius: 8px;
+  border-top-left-radius: 48px;
 }
