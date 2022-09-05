@@ -2,7 +2,7 @@
 layout: "../../layouts/BlogPost.astro"
 title: "Building lofi: Sync"
 description: "Part 2 on the internals of lofi, my local-first data framework."
-pubDate: "Sep 5 2022"
+pubDate: "Sep 12 2022"
 heroImage: "/resource-database-I12XKpvVz9g-unsplash.jpg"
 ---
 
@@ -13,8 +13,6 @@ heroImage: "/resource-database-I12XKpvVz9g-unsplash.jpg"
 > 4. [Migration](/blog/lofi-migration)
 
 Sync is a big part of lofi, and the core concepts which power it are relevant even to local-only scenarios.
-
-I hope that most aspects of sync will pretty much work without getting in your way. But there are of course a lot of good reasons to want to understand the underlying system. It can help with debugging your app (by understanding why data is stored how it is), finding issues with the sync itself (I hope you don't!), or as inspiration if you want to create your own local-first server-sync solution!
 
 Here are some of the high-level concepts we need to cover:
 
@@ -76,11 +74,11 @@ So any time you modify a document, it will create an operation like the one abov
 
 When a client connects to the server after being offline, it might have some operations that it created offline it wants to tell the server about. Likewise, the server probably has quite a few operations from other clients which were created while the client was offline.
 
-So the client and server to a synchronization dance. The dance includes 3 steps. The shape of each message in this exchange can be found in detail in `@lofi/common/src/protocol.ts`.
+So the client and server do a synchronization dance. The dance includes 3 steps. The shape of each message in this exchange can be found in detail in `@lofi/common/src/protocol.ts`.
 
 #### Sync 1: The client introduces itself
 
-The client sends a message which includes its `replicaId` and a schema version. The version is relevant to migrations, discussed in a different wiki. The replica ID tells the server which client this is, so the server can make the first move in syncing operations back.
+The client sends a message which includes its `replicaId`. The replica ID tells the server which client this is, so the server can make the first move in syncing operations back.
 
 > Side note: can't I just send someone else's replica ID?
 >
@@ -121,7 +119,7 @@ A Baseline is a snapshot of a document at a particular point in time. A newly cr
 
 To compute a document view, you basically start with the baseline and iterate over every operation in your history which related to that document, in timestamp order. Apply each operation to the baseline, and your final copy of that data is the current state of the document (according to your replica).
 
-Where baselines come in handy is rebasing. As stated in lofi's opinions, we don't really care about preserving history past a certain point.
+Where baselines come in handy is rebasing. As stated in lofi's [goals](/blog/lofi-intro), we don't really care about preserving history past a certain point.
 
 Let's say we only want to support 100 undo events on each device. That means, logically, that if I made 101 local operations, I can _no longer undo my first one_. If I can't undo it, no one can - which means this change is set in stone. There's no reason we should continue storing it in history, so we want to apply it to our Baseline and drop it.
 
