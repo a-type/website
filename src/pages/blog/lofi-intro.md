@@ -1,8 +1,8 @@
 ---
 layout: "../../layouts/BlogPost.astro"
-title: "Building lofi: the goal"
-description: "Part 1 on the internals of lofi, my local-first data framework."
-pubDate: "Sep 3 2022"
+title: "Towards small, local web apps"
+description: "why I'm building a new system for web storage and sync"
+pubDate: "Sep 15 2022"
 heroImage: "/mariola-grobelska-n3JPNo11Aac-unsplash.jpg"
 ---
 
@@ -30,7 +30,7 @@ My intuition says that what I want should be possible. Sitting with that a bit, 
 
 It's time to reset how I build. In the web we have an amazing, free, powerful distribution tool for local software. How much can I get done with just a webpage? And, after that, what would it take to incorporate modern table-stakes like sync or realtime collaboration? Do these things really require globally distributed servers, pub/sub channels to connect them all, database replicas, all that?
 
-Local-first software is not a new idea. It's still relatively new to the web, but we've been shipping software that interacts with local files or SQLite in other contexts as long as we've been shipping software.
+Local-first software is not a new idea. It's still relatively new to the web, but we've been shipping software that interacts with local files or SQLite in other contexts for ages. I'm kind of jealous of mobile apps.
 
 Cloud-hosted web content has really changed user expectations, though. Syncing data to the cloud, quietly, without conflicts, is table stakes. Real-time interactions with others seems like a growing expectation as well, depending on the needs you're solving. Plus, multiplayer is just fun, it's great UX.
 
@@ -73,9 +73,9 @@ There are also common concerns of local-first or peer-to-peer data layers I expl
 
 ## Why these opinions?
 
-I built lofi to solve my own problem: I wanted to create a small, friendly, _cheap_ web app which I could host indefinitely without getting sucked into a cycle of continual product growth in order to pay the bills. But I also didn't want to abandon more traditional client-server simplicity and complicate my life with the concerns of peer-to-peer highly distributed trustless systems. Something I could have full understanding and control of, which was as free as a webpage for local-only users, and as cheap as a single Node server for anyone who wanted sync or realtime features.
+I've built a prototype system to solve my own problem: I wanted to create a small, friendly, _cheap_ web app which I could host indefinitely without getting sucked into a cycle of continual product growth in order to pay the bills. But I also didn't want to abandon more traditional client-server simplicity and complicate my life with the concerns of peer-to-peer highly distributed trustless systems. Something I could have full understanding and control of, which was as free as a webpage for local-only users, and as cheap as a single Node server for anyone who wanted sync or realtime features.
 
-So that's what I'm building. I hope lofi is a humble but effective option if your needs are similar to mine.
+So that's what I'm building. I hope I can release it in a reusable set of packages soon!
 
 ## But really, why?
 
@@ -83,7 +83,7 @@ It's easy, as someone who believes I'm a capable designer of systems, who wants 
 
 But you may have picked up throughout this post that a lot of my impetus here is entangled with anxiety. I worry about shipping products. Taking money makes me feel obligated, responsible, constrained. And yet there's nothing I want more than the freedom which I hope making a business for myself out of my skills could provide. It's a confounding position to be in.
 
-All this leads to an incredibly lean, bootstrapping mindset for me. I want to create small things that provide as much value as they can with a limited footprint. Services that won't eat away at the very life I'm trying to create by evolving into complicated, 'web-scale' monsters.
+All this leads to an incredibly lean, bootstrapping mindset for me. I want to create small things that provide as much value as they can with a limited footprint. Services that won't eat away at the very life I'm trying to create by evolving into complicated, 'web-scale' monsters hungry for VC cash.
 
 I also have anxiety about the sustainability of my work, and what happens if my costs become more than I can recoup. So I'm almost pathologically avoiding paid tools and services. Ideally if I wanted to put a project aside for months, or if it were drawing no revenue at all, these would not present do-or-die choices to me. I could step away, rest, think, reinvent.
 
@@ -91,4 +91,4 @@ But perhaps the biggest threat of all to me is what I call the 'scale trap,' as 
 
 I don't really want to maximize profits, to be honest. I don't want to be beholden to stakeholders or investors. If I could sell a small product, for a small price, to a small number of people, and still make enough to live on... that would be great. Build things I think are meaningful, make as much as I need, and spend the rest of my time and energy on living.
 
-lofi is an experiment toward that end. It exists, not just because of what I think, but what I feel. What I hope for.
+My latest work is an experiment toward that end. It exists, not just because of what I think, but what I feel. What I hope for.
