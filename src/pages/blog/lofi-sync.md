@@ -1,18 +1,17 @@
 ---
 layout: "../../layouts/BlogPost.astro"
-title: "Building lofi: Sync"
-description: "Part 2 on the internals of lofi, my local-first data framework."
-pubDate: "Sep 12 2022"
+title: "Syncing local web app data"
+description: "Part 1 on building a local-first data framework."
+pubDate: "Sep 15 2022"
 heroImage: "/resource-database-I12XKpvVz9g-unsplash.jpg"
 ---
 
-> lofi series
+> Local-first web apps series
 > 1. [The goal](/blog/lofi-intro)
 > 2. [Sync](/blog/lofi-sync)
-> 3. [Storage & Queries](/blog/lofi-storage)
-> 4. [Migration](/blog/lofi-migration)
+> 3. More... later
 
-Sync is a big part of lofi, and the core concepts which power it are relevant even to local-only scenarios.
+Sync is a big part of the problem space for local web storage, and the core concepts which power it are relevant even to local-only scenarios.
 
 Here are some of the high-level concepts we need to cover:
 
@@ -52,7 +51,7 @@ Let's go over each field:
 
 ### Patches
 
-Operations apply patches. Patches are lists of changes to make to a document. lofi uses JSON-Patch as the primary syntax for patches. A JSON-Patch operation looks like this:
+Operations apply patches. Patches are lists of changes to make to a document. I'll use JSON-Patch as the syntax for patches. A JSON-Patch operation looks like this:
 
 ```
 {
@@ -64,9 +63,7 @@ Operations apply patches. Patches are lists of changes to make to a document. lo
 
 The value at `path` is replaced with `'baz'` in this example. JSON-Patch describes several operations to do a lot of useful transformations.
 
-lofi extends JSON-Patch with a few extra transforms for lists: push, and move.
-
-lofi also adds a special kind of patch which is literally: `'DELETE'`. Hopefully the meaning is clear.
+I also add a special kind of patch which is literally: `'DELETE'`. Hopefully the meaning is clear.
 
 So any time you modify a document, it will create an operation like the one above, which will include a list of patches to make.
 
@@ -74,7 +71,7 @@ So any time you modify a document, it will create an operation like the one abov
 
 When a client connects to the server after being offline, it might have some operations that it created offline it wants to tell the server about. Likewise, the server probably has quite a few operations from other clients which were created while the client was offline.
 
-So the client and server do a synchronization dance. The dance includes 3 steps. The shape of each message in this exchange can be found in detail in `@lofi/common/src/protocol.ts`.
+So the client and server do a synchronization dance. The dance includes 3 steps.
 
 #### Sync 1: The client introduces itself
 
@@ -83,7 +80,7 @@ The client sends a message which includes its `replicaId`. The replica ID tells 
 > Side note: can't I just send someone else's replica ID?
 >
 > That would be nefarious, but no - since we have a trusted server, we actually link replica IDs to particular logged-in users when they're
-> seen. If you tried to hijack someone's replica ID, the app server should refuse to forward your message to lofi's server code.
+> seen. If you tried to hijack someone's replica ID, the app server should refuse to forward your message to the sync server code.
 
 #### Sync 2: The server responds with changes to apply
 
@@ -119,7 +116,7 @@ A Baseline is a snapshot of a document at a particular point in time. A newly cr
 
 To compute a document view, you basically start with the baseline and iterate over every operation in your history which related to that document, in timestamp order. Apply each operation to the baseline, and your final copy of that data is the current state of the document (according to your replica).
 
-Where baselines come in handy is rebasing. As stated in lofi's [goals](/blog/lofi-intro), we don't really care about preserving history past a certain point.
+Where baselines come in handy is rebasing. As stated in my [goals](/blog/lofi-intro), I don't really care about preserving history past a certain point.
 
 Let's say we only want to support 100 undo events on each device. That means, logically, that if I made 101 local operations, I can _no longer undo my first one_. If I can't undo it, no one can - which means this change is set in stone. There's no reason we should continue storing it in history, so we want to apply it to our Baseline and drop it.
 
