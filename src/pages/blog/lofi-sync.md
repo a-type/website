@@ -2,7 +2,7 @@
 layout: "../../layouts/BlogPost.astro"
 title: "Syncing local web app data"
 description: "Part 1 on building a local-first data framework."
-pubDate: "Sep 15 2022"
+pubDate: "Sep 18 2022"
 heroImage: "/resource-database-I12XKpvVz9g-unsplash.jpg"
 ---
 
