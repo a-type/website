@@ -96,13 +96,15 @@ When either the client or server receives new operations, it inserts them into i
 
 It takes note of which documents were affected by each new operation while it does that.
 
-Then, for each updated document, it pulls the whole operation history in order, and re-applies all the operations to recompute the "view" of the document. We can't just apply the new operations, because they could have been created in the past, while we were offline. They might come before local operations we already have, and that might affect the outcome of those changes as well.
+On the client, for each updated document, it pulls the whole operation history in order, and re-applies all the operations to recompute the "view" of the document. We can't just apply the new operations, because they could have been created in the past, while we were offline. They might come before local operations we already have, and that might affect the outcome of those changes as well.
 
 For example, imagine we pushed an item onto the `todo1.tags` list while we were offline, at 5:00 PM. Meanwhile, a peer who was online also pushed a tag at 4:30 PM, but we didn't know that. When we come back online, our peer's operation will be inserted _before_ ours into our operation history. So their tag would come before ours. If we had naively applied their operation to our existing document, we'd have them in the wrong order.
 
 These recomputed views are stored in the database where you would expect your documents to be. And on the client, any queries affected get re-run.
 
 How does the replica re-apply these operations? For that we can start on Baselines.
+
+> Side note: The server doesn't actually need to do any of that operation-reapplying. In fact, it has no final 'view' of the document at all. It only needs to store and work with the raw operations.
 
 ## Baselines
 
