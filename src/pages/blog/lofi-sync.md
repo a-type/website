@@ -132,6 +132,8 @@ To get things going, each replica announces its oldest historical timestamp it s
 
 "Ack" stands for "acknowledge." Each time any replica receives an operation, it "acks" it. The server then stores the latest timestamp of acked operations for each replica. By doing so it can now compute a "global ack" - the earliest timestamped operation every single replica has definitely seen. This helps us implement constraint 2.
 
+> As a proponent of verbosity for the sake of understanding, you'd think I'd just write out "acknowledge." But "ack" is more fun to say.
+
 ### Deciding what to rebase
 
 The server has the most knowledge in our system, so it's the best place to decide what to rebase. At regular intervals after changes are made, it will scan for any new rebases it can do.
