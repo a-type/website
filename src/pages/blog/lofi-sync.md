@@ -2,7 +2,7 @@
 layout: "../../layouts/BlogPost.astro"
 title: "Syncing local web app data"
 description: "Part 1 on building a local-first data framework."
-pubDate: "Sep 18 2022"
+pubDate: "Sep 19 2022"
 heroImage: "/resource-database-I12XKpvVz9g-unsplash.jpg"
 ---
 
@@ -11,17 +11,11 @@ heroImage: "/resource-database-I12XKpvVz9g-unsplash.jpg"
 > 2. [Sync](/blog/lofi-sync)
 > 3. More... later
 
-Sync is a big part of the problem space for local web storage, and the core concepts which power it are relevant even to local-only scenarios.
-
-Here are some of the high-level concepts we need to cover:
-
-1. Operations
-2. Rebasing and baselines
-3. Consensus
+Sync is a big part of the problem space for local web storage, and the core concepts which power it are relevant even to local-only scenarios. In this post I'll outline how I approached server-client sync for IndexedDB documents.
 
 ## Operations
 
-The core of sync is the Operation. An Operation describes an incremental change applied to a Document. All Operations on all Documents are stored in one big list, on both the client and server!
+The core of sync (in my world at least) is the Operation. An Operation describes an incremental change applied to a Document. All Operations on all Documents are stored in one big list, on both the client and server!
 
 Operations look roughly like this on the server:
 
@@ -146,7 +140,7 @@ It does this by choosing some N operations from the start of history, then deter
 
 The server stores which documents were rebased, and up to which timestamp. It can then send this summarized information to clients, so they can rebase those documents, too. Clients need less information for their rebase - they don't need to be aware of the state of every peer. Since the server is trusted with higher information and decisions, the client can just do as it's told (or not - there's no harm in not rebasing at all, except that the client's storage will grow indefinitely).
 
-## Consensus
+## Some edge cases
 
 While the sync process outlined so far is not quite _simple_, I hope it feels simple enough to understand. However, we're not out of the woods yet. There's a 'nefarious' case to consider related to clients which go offline for a long time.
 
@@ -159,3 +153,13 @@ As long as one replica goes offline, it's not possible to rebase a document if t
 To mitigate this, the server may set a 'delinquent' window for replicas. If a replica doesn't connect within that timeframe, it is flagged and ignored for consensus. This might be longer for highly asynchronous applications or shorter for more realtime ones.
 
 When a delinquent peer reconnects, their local changes are forfeit, and they must reset to the consensus state of the rest of the network. It's possible to be a little smarter about this and allow documents which originated entirely on the offline peer still be synchronized back.
+
+### Rebasing for clients which never go online
+
+Ideally, it shouldn't only be syncing clients who benefit from history compaction. In fact, clients who never sync and are offline-only should have a much easier time of rebasing, since they don't need to worry about acks at all. But with the server-initiated approach taken above, this isn't an option by default.
+
+That alone is enough to make me feel like there's a better generalized solution for rebasing. But in the meantime, I've settled on a special behavior: whenever a local change is added, we check to see the last time we synced to the server (this is stored alongside other metadata). If the result is "never," we can run local rebases according to our local undo stack, and the algorithm is roughly the same as above.
+
+## Wrapping up
+
+Hopefully that was clear enough to illuminate my approach to syncing local-first data. It's not the only way, by a long shot, but it aligns with my personal project goals, and so far, it works!
