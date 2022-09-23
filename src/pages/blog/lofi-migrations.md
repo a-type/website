@@ -2,7 +2,7 @@
 layout: "../../layouts/BlogPost.astro"
 title: "Local-first data migrations"
 description: "now with time travel!"
-pubDate: "Oct 1 2022"
+pubDate: "Sep 23 2022"
 heroImage: "/susan-wilkinson-vnus9kq-96w-unsplash.jpg"
 ---
 I have to tell you, after finally feeling like I'd figured out how to store, query, and sync data... Migrations nearly broke me!
