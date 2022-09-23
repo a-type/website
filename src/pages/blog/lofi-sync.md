@@ -1,7 +1,7 @@
 ---
 layout: "../../layouts/BlogPost.astro"
 title: "Syncing local web app data"
-description: "Part 1 on building a local-first data framework."
+description: "one naive approach, at least"
 pubDate: "Sep 19 2022"
 heroImage: "/resource-database-I12XKpvVz9g-unsplash.jpg"
 ---
@@ -45,7 +45,7 @@ Let's go over each field:
 
 ### Patches
 
-Operations apply patches. Patches are lists of changes to make to a document. I'll use JSON-Patch as the syntax for patches. A JSON-Patch operation looks like this:
+Operations apply patches. Patches are lists of changes to make to a document. For this post I'll use JSON-Patch as the syntax for patches. A JSON-Patch operation looks like this:
 
 ```
 {
@@ -56,6 +56,8 @@ Operations apply patches. Patches are lists of changes to make to a document. I'
 ```
 
 The value at `path` is replaced with `'baz'` in this example. JSON-Patch describes several operations to do a lot of useful transformations.
+
+JSON-Patch isn't the most robust solution for conflict avoidance on its own. It's particularly lacking in the case of lists. But it's simple enough to reason about for the purposes of explaining the overall sync system, and in my experience so far it's "good enough" for apps that aren't highly collaborative.
 
 I also add a special kind of patch which is literally: `'DELETE'`. Hopefully the meaning is clear.
 
