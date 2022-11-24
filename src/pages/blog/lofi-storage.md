@@ -1,10 +1,17 @@
 ---
 layout: "../../layouts/BlogPost.astro"
 title: "Compound index queries in IndexedDB"
-description: "using unicode for advanced querying"
-pubDate: "Oct 6 2022"
+description: "hacking unicode for advanced querying"
+pubDate: "Dec 31 2022"
 heroImage: "/susan-wilkinson-vnus9kq-96w-unsplash.jpg"
 ---
+
+> lo-fi series
+> 1. [The goal](/blog/lofi-intro)
+> 2. [Sync](/blog/lofi-sync)
+> 3. [Migrations](/blog/lofi-migrations)
+> 4. [Index queries](/blog/lofi-storage)
+
 A big part of my goal for creating a local-first data layer is to provide a great client-server sync library. But beyond that, I want provide a delightful interface over IndexedDB, our notoriously awkward web-native database.
 
 IndexedDB has a very constrained feature set which makes it unintuitive to anyone used to SQL's extensive querying capabilities. As the name implies, IndexedDB only really offers _indexes_ - pre-computed bits of data which can quickly connect you to the matching objects. That means if you want to optimally look up data, you'll want to plan ahead and create relevant indexes.

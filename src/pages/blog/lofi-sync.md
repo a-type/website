@@ -6,10 +6,10 @@ pubDate: "Sep 19 2022"
 heroImage: "/resource-database-I12XKpvVz9g-unsplash.jpg"
 ---
 
-> Local-first web apps series
+> lo-fi series
 > 1. [The goal](/blog/lofi-intro)
 > 2. [Sync](/blog/lofi-sync)
-> 3. More... later
+> 3. [Migrations](/blog/lofi-migrations)
 
 Sync is a big part of the problem space for local web storage, and the core concepts which power it are relevant even to local-only scenarios. In this post I'll outline how I approached server-client sync for IndexedDB documents.
 
@@ -21,13 +21,10 @@ Operations look roughly like this on the server:
 
 ```ts
 {
-  id: '1',
-  libraryId: 'some-group-library-id',
-  collection: 'todos',
-  documentId: 'abc1',
-  patch: [...], // we'll explain later
+  libraryId: 'grant\'s library',
+  oid: 'todos/1.tags:abcd123',
+  data: ..., // we'll explain later
   timestamp: '2020-01-01T00:00:00.000Z:2342341:ajsdflaksjdf',
-  replicaId: 'grants phone'
 }
 ```
 
@@ -35,136 +32,209 @@ On the client they're similar, but the client doesn't store `libraryId`.
 
 Let's go over each field:
 
-- `id`: A globally unique identifier for the operation.
 - `libraryId`: A "Library" is the collection of all documents shared among a group of users. Each group of users can only access documents in their library.
-- `collection`: A collection is a group of documents defined in your schema which share a shape.
-- `documentId`: The ID of the document this operation is applied to.
-- `patch`: The patch is a list of operations to apply to the document. We'll talk about it later on.
+- `oid`: A formatted unique identifier for an object within the library. Encoded in the OID is the document collection, the unique document ID, a subpath of the field (if any), and a random string.
+- `data`: The data is a patch operation to apply to the document. We'll talk about it later on.
 - `timestamp`: The timestamp is a hybrid logical clock value that represents the moment the operation was created. What you need to know about a hybrid logical clock is that it can create sequentially ordered timestamps across distributed devices, even with clock drift.
-- `replicaId`: The replica ID is a unique identifier for the device that created the operation. It wouldn't actually be human readable but is here for demonstration.
 
 ### Patches
 
-Operations apply patches. Patches are lists of changes to make to a document. For this post I'll use JSON-Patch as the syntax for patches. A JSON-Patch operation looks like this:
+Operations apply patches. Patches are changes that combine to make to a document. There are a variety of patch types, but basically they're atomic inputs for pure functions that modify an initial object to produce an output one.
+
+For example:
 
 ```
 {
-  op: 'replace',
-  path: '/foo/bar',
-  value: 'baz'
+  op: 'set',
+  name: 'bar',
+  value: 1
 }
 ```
 
-The value at `path` is replaced with `'baz'` in this example. JSON-Patch describes several operations to do a lot of useful transformations.
+The value at `name` of the given object is replaced with `1` in this example.
 
-JSON-Patch isn't the most robust solution for conflict avoidance on its own. It's particularly lacking in the case of lists. But it's simple enough to reason about for the purposes of explaining the overall sync system, and in my experience so far it's "good enough" for apps that aren't highly collaborative.
+So any time you modify a document, instead of directly assigning to properties, lo-fi generates a list of operations which contain instructions like above. Successive application, in order, of all of these instructions computes the canonical data for your object (which, for performance's sake, is often cached in-memory).
 
-I also add a special kind of patch which is literally: `'DELETE'`. Hopefully the meaning is clear.
+### Objects and object references
 
-So any time you modify a document, it will create an operation like the one above, which will include a list of patches to make.
+You may have noticed that the OID, the encoded object identifier, stores a lot of meaningful information. There's an OID assigned to every nested level of object in a document (think: JS `object`s and `Array`s). All objects are 'normalized' in the sync system, even though the replicas themselves deal with denormalized document-style data. Why?
+
+Individual object identity is vital when computing conflict resolution in offline scenarios, especially lists. For example, consider a case where you have a list of comments attached to a post. While replicas A and B are offline, they both push a new comment with initial empty text to that list:
+
+```ts
+{
+  op: 'list-push',
+  name: 'comments',
+  value: {
+    text: '',
+  },
+}
+```
+
+This would be a naive way to do it. But suppose they go on to write entirely different comments. If we don't have object identity, each replica believes their comment is at index `0`. We have no better way to reference which comment the replica is modifying. So both replicas will start writing operations like this...
+
+```ts
+{
+  op: 'set',
+  name: 'comments.0.text',
+  value: 'hello from A',
+}
+
+{
+  op: 'set',
+  name: 'comments.0.text',
+  value: 'hello from B'
+}
+```
+
+And when both of these replicas come back online, here's what will happen:
+
+1. Both list push operations will be applied. There will be two empty comments in the list
+2. Both sets of change operations will be applied against the comment at index `0`
+3. We end up with 1 comment that was written and then overwritten by both replicas, and one that is still empty!
+
+Instead, we must generate unique identities for both comments. Then each replica knows exactly which comment it is editing, even if the final computed position of their comment differs from what they see while offline.
+
+So instead of naively pushing a whole comment object, we split it up:
+
+```ts
+// The comment from replica A
+{
+  oid: 'posts/1.comments.#:abcd123',
+  op: 'init',
+  value: {
+    text: ''
+  }
+},
+{
+  oid: 'posts/1.comments:fghi234',
+  op: 'list-push',
+  value: {
+    '@@type': 'ref',
+    id: 'posts/1.comments.#:abcd123'
+  }
+}
+```
+
+Our new operation list initializes our identified comment object, then pushes a _reference to it_ onto the comments list.
+
+Notice how the OID we generated for the comment includes a random string. When each replica creates its comment independently, their OIDs will not overlap.
+
+```ts
+// The comment from replica B
+{
+  oid: 'posts/1.comments.#:wxyz7890',
+  op: 'init',
+  value: {
+    text: ''
+  }
+},
+{
+  oid: 'posts/1.comments:fghi234',
+  op: 'list-push',
+  value: {
+    '@@type': 'ref',
+    id: 'posts/1.comments.#:wxyz7890'
+  }
+}
+```
+
+Replicas can now make changes to their comments by their OID, and those changes will end up on their exact comment. The order the comments show up in once all changes are merged together is entirely up to the timestamp ordering of those `list-push` operations, but won't affect the final state of each comment.
 
 ### Syncing operations
 
-When a client connects to the server after being offline, it might have some operations that it created offline it wants to tell the server about. Likewise, the server probably has quite a few operations from other clients which were created while the client was offline.
+When a replica connects to the server after being offline, it might have some operations that it created offline it wants to tell the server about. Likewise, the server probably has quite a few operations from other replicas which were created while the replica was offline.
 
-So the client and server do a synchronization dance. The dance includes 3 steps.
+So the replica and server do a synchronization exchange.
 
-#### Sync 1: The client introduces itself
+#### Sync: The replica introduces itself and provides its changes
 
-The client sends a message which includes its `replicaId`. The replica ID tells the server which client this is, so the server can make the first move in syncing operations back.
+The replica sends a message which includes its `replicaId`. The replica ID tells the server which replica this is.
 
 > Side note: can't I just send someone else's replica ID?
 >
 > That would be nefarious, but no - since we have a trusted server, we actually link replica IDs to particular logged-in users when they're
 > seen. If you tried to hijack someone's replica ID, the app server should refuse to forward your message to the sync server code.
 
-#### Sync 2: The server responds with changes to apply
+Included in the initial sync message is a list of operations the replica has created since it last synced with the server.
 
-The server computes the changes which the client needs using its `replicaId`. It responds with a message that includes the list of Operations, a list of Baselines (more on that later), and a timestamp which tells the client which operations it should send back - i.e. all of the local operations it has since that timestamp.
+#### Sync response: The server responds with changes to apply
 
-This is the reason the client doesn't send operations in its first message. It may not have as clear of an understanding of when to start its history than the server does.
+When the server receives a sync message from a replica, it inserts all the new operations into its own database. It also rebroadcasts these operations to any connected peers.
 
-#### Sync 3: The client responds with local changes
+The server then computes the list of operations which the replica needs to be informed of since its last connection using its `replicaId`. It responds with a message that includes the list of Operations, a list of Baselines (more on that later), and a timestamp.
 
-The client now knows which operations it should pull and send to the server. It responds with those, and we're done.
+There's some additional metadata in the server's response that's useful, but that's what is important for syncing.
 
 ### Syncing realtime operations
 
-Of course, once you're online, we want things to be more responsive. Syncing operations as they happen lets us have full realtime multiplayer quite easily! Whenever a change is made to a document, the client sends that operation in a message to the server. The server then rebroadcasts the operation to all of its peers.
+Of course, once you're online, we want things to be more responsive. Syncing operations as they happen lets us have full realtime multiplayer quite easily! Whenever a change is made to a document, the replica sends that operation in a message to the server. The server then rebroadcasts the operation to all of its peers.
+
+In lo-fi, clients don't stream operations immediately to the server by default - they batch them to reduce traffic. Batching timerange is configurable.
 
 ### What happens when a replica receives operations
 
-When either the client or server receives new operations, it inserts them into its big global operations list.
+When either the replica or server receives new operations, it inserts them into its big global operations list.
 
 It takes note of which documents were affected by each new operation while it does that.
 
-On the client, for each updated document, it pulls the whole operation history in order, and re-applies all the operations to recompute the "view" of the document. We can't just apply the new operations, because they could have been created in the past, while we were offline. They might come before local operations we already have, and that might affect the outcome of those changes as well.
+On the replica, for each updated document, it pulls the whole operation history in order, and re-applies all the operations to recompute the "view" of the document. We can't just apply the new operations, because they could have been created in the past, while we were offline. They might come before local operations we already have, and that might affect the outcome of those changes as well.
 
 For example, imagine we pushed an item onto the `todo1.tags` list while we were offline, at 5:00 PM. Meanwhile, a peer who was online also pushed a tag at 4:30 PM, but we didn't know that. When we come back online, our peer's operation will be inserted _before_ ours into our operation history. So their tag would come before ours. If we had naively applied their operation to our existing document, we'd have them in the wrong order.
 
-These recomputed views are stored in the database where you would expect your documents to be. And on the client, any queries affected get re-run.
+> _Note:_ for performance tuning, we can store a 'high water mark' snapshot of an object instead of recomputing the whole history. If an operation arrives which is before the high water mark, we discard it and recompute from the beginning, storing a new high water mark along the way. The position of the high water mark could be a heuristic decision.
+
+These recomputed views are stored in the database where you would expect your documents to be. And on the replica, any queries affected get re-run.
 
 How does the replica re-apply these operations? For that we can start on Baselines.
 
-> Side note: The server doesn't actually need to do any of that operation-reapplying. In fact, it has no final 'view' of the document at all. It only needs to store and work with the raw operations.
+> _Note:_ The server doesn't actually need to do any of that operation-reapplying. In fact, it has no final 'view' of the object at all. It only needs to store and work with the raw operations.
 
 ## Baselines
 
-A Baseline is a snapshot of a document at a particular point in time. A newly created document doesn't have a baseline at all, so the system assumes `{}` is the base state until one is stored.
+A Baseline is a snapshot of an object at a particular point in time. A newly created object doesn't have a baseline at all.
 
-To compute a document view, you basically start with the baseline and iterate over every operation in your history which related to that document, in timestamp order. Apply each operation to the baseline, and your final copy of that data is the current state of the document (according to your replica).
+To compute an object view, you basically start with the baseline and iterate over every operation in your history which related to that document, in timestamp order. Apply each operation to the baseline, and your final copy of that data is the current state of the object (according to your replica).
 
-Where baselines come in handy is rebasing. As stated in my [goals](/blog/lofi-intro), I don't really care about preserving history past a certain point.
+If the object doesn't have a baseline, the first operation is always an `init` operation, which sets the state of the entire object to an initial value.
 
-Let's say we only want to support 100 undo events on each device. That means, logically, that if I made 101 local operations, I can _no longer undo my first one_. If I can't undo it, no one can - which means this change is set in stone. There's no reason we should continue storing it in history, so we want to apply it to our Baseline and drop it.
+Where baselines come in handy is compacting history. As stated in my [goals](/blog/lofi-intro), I don't really care about preserving history past a certain point.
 
-Doing that is not quite so simple, though. Sure, I could drop my local operations, but then how do other people know to drop them, too? There's also a snag we have to consider: what if someone inserts an operation before my oldest one? In that case, I would need to still have it around so I could re-apply it when I merge their operations with my own.
-
-These complexities give rise to some constraints which define how we "rebase" documents:
-
-1. We can only drop the oldest operations applied to a document. We can never drop operations in the 'middle' of a document's history.
-2. We can only drop operations which everyone has seen. Otherwise we won't have that operation to sync to them when they come online.
-3. We can only drop operations which are older than the oldest thing which the creating client can undo. i.e. if my undo stack is 100 long, we can only drop items 101+ in the past. Hope that makes sense.
-
-### Announcing our undo status
-
-To get things going, each replica announces its oldest historical timestamp it still can undo to the server, each time it makes a change. The server stores this and keeps track. That helps us implement constraint 3.
+To determine when we can start compacting old operations, we need to know what all of our peer replicas have seen. Once everybody agrees on history, we can condense that history back into the baseline.
 
 ### Broadcasting the global "ack"
 
-"Ack" stands for "acknowledge." Each time any replica receives an operation, it "acks" it. The server then stores the latest timestamp of acked operations for each replica. By doing so it can now compute a "global ack" - the earliest timestamped operation every single replica has definitely seen. This helps us implement constraint 2.
+"Ack" stands for "acknowledge." Each time any replica receives an operation, it "acks" it. The server then stores the latest timestamp of acked operations for each replica. By doing so it can now compute a "global ack" - the earliest timestamped operation every single replica has definitely seen. Once a client receives the global ack, it knows it's safe to rebase any operations which occurred before that time. Since all operations are stored together in one big table, this is as simple as a single indexed query, then iterating over the result list to group changes by object.
 
 > As a proponent of verbosity for the sake of understanding, you'd think I'd just write out "acknowledge." But "ack" is more fun to say.
 
-### Deciding what to rebase
-
-The server has the most knowledge in our system, so it's the best place to decide what to rebase. At regular intervals after changes are made, it will scan for any new rebases it can do.
-
-It does this by choosing some N operations from the start of history, then determining which ones fit the criteria above. For any set of collected operations which relate to a document, it will rebase the document. It keeps track of individual document history so that it can conform to constraint 1, too.
-
-### Client rebasing
-
-The server stores which documents were rebased, and up to which timestamp. It can then send this summarized information to clients, so they can rebase those documents, too. Clients need less information for their rebase - they don't need to be aware of the state of every peer. Since the server is trusted with higher information and decisions, the client can just do as it's told (or not - there's no harm in not rebasing at all, except that the client's storage will grow indefinitely).
-
 ## Some edge cases
 
-While the sync process outlined so far is not quite _simple_, I hope it feels simple enough to understand. However, we're not out of the woods yet. There's a 'nefarious' case to consider related to clients which go offline for a long time.
+While the sync process outlined so far is not quite _simple_, I hope it feels simple enough to understand. However, we're not out of the woods yet. There's a 'nefarious' case to consider related to replicas which go offline for a long time.
 
 ### Rebasing with absent peers
 
-> Status: no optimizations implemented yet. This is as of yet theoretical.
+As long as one replica goes offline, it's not possible to compute a new global ack timestamp! If that replica never comes back online, we're stuck. That may be unintuitive, but consider: if that replica comes back online with old operations and we've deleted that history, we won't know how to insert those operations in order to resolve a merged final state.
 
-As long as one replica goes offline, it's not possible to rebase a document if they were the earliest one to edit it. While they are offline, we don't know if they will undo their original change. If that replica never comes back online, we're stuck with this document's operations, even if it gets deleted by another peer.
+To mitigate this, the server may set a 'truant' window for replicas. If a replica doesn't connect within that timeframe, it is flagged and ignored for global ack computation. This might be longer for highly asynchronous applications or shorter for more realtime ones.
 
-To mitigate this, the server may set a 'delinquent' window for replicas. If a replica doesn't connect within that timeframe, it is flagged and ignored for consensus. This might be longer for highly asynchronous applications or shorter for more realtime ones.
+When a truant peer reconnects, their local changes are forfeit, and they must reset to the consensus state of the rest of the network. It's possible to be a little smarter about this and allow documents which originated entirely on the offline peer still be synchronized back (TODO).
 
-When a delinquent peer reconnects, their local changes are forfeit, and they must reset to the consensus state of the rest of the network. It's possible to be a little smarter about this and allow documents which originated entirely on the offline peer still be synchronized back.
+### Read-only replicas
 
-### Rebasing for clients which never go online
+Since read-only replicas could never submit a new operation, they don't have the same problems as truant replicas above. We can just ignore them altogether for global ack. They still have to rebase like any other replica, but we don't wait on them to be online to rebase peers.
 
-Ideally, it shouldn't only be syncing clients who benefit from history compaction. In fact, clients who never sync and are offline-only should have a much easier time of rebasing, since they don't need to worry about acks at all. But with the server-initiated approach taken above, this isn't an option by default.
+### Rebasing for replicas which never go online
 
-That alone is enough to make me feel like there's a better generalized solution for rebasing. But in the meantime, I've settled on a special behavior: whenever a local change is added, we check to see the last time we synced to the server (this is stored alongside other metadata). If the result is "never," we can run local rebases according to our local undo stack, and the algorithm is roughly the same as above.
+Ideally, it shouldn't only be syncing replicas who benefit from history compaction. In fact, replicas who never sync and are offline-only should have a much easier time of rebasing, since they don't need to worry about acks at all.
+
+If a replica has never synced before, it doesn't need a global ack timestamp to start a rebase. It just periodically compacts history as it goes.
+
+### Syncing for the first time
+
+When an offline replica upgrades to become a syncing replica for the first time, it may have local baselines from its personal history compaction. Without these baselines, synced state will be broken.
+
+So, when a replica detects it has never synced before, it also sends its local baselines with the initial sync. For all subsequent syncs, this is not needed.
 
 ## Wrapping up
 

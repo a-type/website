@@ -2,9 +2,15 @@
 layout: "../../layouts/BlogPost.astro"
 title: "Local-first data migrations"
 description: "now with time travel!"
-pubDate: "Sep 23 2022"
+pubDate: "Nov 23 2022"
 heroImage: "/susan-wilkinson-vnus9kq-96w-unsplash.jpg"
 ---
+
+> lo-fi series
+> 1. [The goal](/blog/lofi-intro)
+> 2. [Sync](/blog/lofi-sync)
+> 3. [Migrations](/blog/lofi-migrations)
+
 I have to tell you, after finally feeling like I'd figured out how to store, query, and sync data... Migrations nearly broke me!
 
 Not because they're that much more complex than sync (not at all, really), but simply because once again what seems like a straightforward scenario (change A to B) hides various edge cases when applied to an offline world.
@@ -17,19 +23,21 @@ Since we have a coordinating server, it would be nice if the server were able to
 
 But what if the server _isn't_ updated first? Perhaps our backend is hosted in a container somewhere, but the frontend is a static website in a CDN. It's possible a client could get its copy of the new code before the server is updated. While we could simply make it a rule that the server must come first in your deployment, this seems needlessly rigid.
 
-I hope it's understandable why migration suddenly felt like a daunting challenge, even after all the work to build the rest of the system! In fact, I'm struggling with that challenge as I write this -- writing documentation like this as if I've already solved a problem is part of my process for finding solutions.
+I hope it's understandable why migration suddenly felt like a daunting challenge, even after all the work to build the rest of the system!
+
+But I hope it's also clear why a local-first storage and sync framework without a story for migrations could result in headaches down the road.
 
 ## Versioning operations
 
 The solution I've adopted is to version the operations. Versioning allows us to make decisions about operations as they come in and preserve the sequential aspect of migration -- i.e. the only sane way to create data migrations is to assume that once you have migrated a collection, you are _from then on_ working with data of the specified migrated shape. So our goal is to ensure that operations with version 1 are always and only ever applied to objects _before_ any operation with version 2, and so on.
 
-There are two ways to go about this. Let's imagine we have Client A who has already updated to version 2 and is making changes to Document 1. So, in abstract, A's history of operations for Document 1 looks like this:
+There are two ways to go about this. Let's imagine we have Replica A who has already updated to version 2 and is making changes to Document 1. So, in abstract, A's history of operations for Document 1 looks like this:
 
 ```
 A: 1a, 1b, 1c, 1d, 2e, 2f, 2g, 2h, 2i
 ```
 
-Client B is offline and hasn't updated their app. It was working off a shared history with Client A, but has now diverged...
+Replica B is offline and hasn't updated their app. It was working off a shared history with Replica A, but has now diverged...
 
 ```
 A: 1a, 1b, 1c, 1d, 2e, 2f, 2g, 2h, 2i
@@ -52,9 +60,9 @@ A,B: 1a, 1b, 1c, 1cc, 1d, 1dd, 2e, 2f, 2g, 2h, 2i
 (1cc and 1dd 'sneak in' because they are before the first version 2 operation, 2e)
 ```
 
-This feels simple at first, but we have to remember that Client B has already stored those operations. We now have to include logic for B to filter its own operation set as part of its migration (which isn't awful, but undercuts the simplicity of this option).
+This feels simple at first, but we have to remember that Replica B has already stored those operations. We now have to include logic for B to filter its own operation set as part of its migration (which isn't awful, but undercuts the simplicity of this option). Plus, B loses its changes! Offline blips can happen anytime while doing realtime collaboration, and this would end up looking like a confusing stutter.
 
-Another option is to decide that time is relative, after all, and if Client B was working on a version of the data which is now 'old,' well, aren't all their changes in the logical 'past?' We could insert them in order behind every version 2 operation without dropping them:
+Another option is to decide that time is relative, after all, and if Replica B was working on a version of the data which is now 'old,' well, aren't all their changes in the logical 'past?' We could insert them in order behind every version 2 operation without dropping them:
 
 ```
 A,B: 1a, 1b, 1c, 1cc, 1d, 1dd, 1ee, 1ff, 1gg, 1hh, 2e, 2f, 2g, 2h, 2i
@@ -98,56 +106,67 @@ const post: Post = {
 }
 ```
 
-For a contrived example, let's suppose Client A changed the `title` field to `'Initial post'`, then migrated the post up to version 2, running a routine which converted the string tags into tags with colors and adding a blank `summary` field. Then Client A fills in their summary.
-
-> I'll use JSONPatch for operations, here, even though it's one of the more naive approaches you could take to change operations. I believe the principles here still apply to more robust patch strategies, so long as migrations themselves only produce idempotent patches to describe data changes.
+For a contrived example, let's suppose Replica A changed the `title` field to `'Initial post'`, then migrated the post up to version 2, running a routine which converted the string tags into tags with colors and adding a blank `summary` field. Then Replica A fills in their summary.
 
 ```ts
 // first change operation
 [
   {
-    op: 'replace',
-    path: '/title',
+    oid: 'posts/1',
+    op: 'set',
+    name: 'title',
     value: 'Initial post',
   }
 ]
 // migration operation changes all migrated fields - future operations are all version 2 now
 [
+  // create the object tag
   {
-    op: 'replace',
-    path: '/tags/0',
-    value: { name: 'dev', color: '#ff0000' }
+    oid: 'posts/1.tags.#:fghi',
+    op: 'init',
+    value: { name: 'dev', color: '#ff0000' },
   },
+  // replace the string tag with a ref to the new object
   {
-    op: 'add',
-    path: '/summary',
+    oid: 'posts/1.tags:abcd',
+    op: 'set',
+    name: 0,
+    value: { '@@type': 'ref', id: 'posts/1.tags.#:fghi' }
+  },
+  // add the summary field
+  {
+    oid: 'posts/1',
+    op: 'set',
+    name: 'summary',
     value: ''
   },
 ]
-// setting the summary
+// after the migration - replica starts modifying data
 [
   {
-    op: 'replace',
-    path: '/summary',
+    oid: 'posts/1',
+    op: 'set',
+    name: 'summary',
     value: 'First post in my blog'
   }
 ]
 ```
 
-Now in the meantime, back on version 1, Client B modifies the `content` and adds a `react` tag.
+Now in the meantime, back on version 1, Replica B modifies the `content` and adds a `react` tag.
 
-```
+```ts
 [
   {
-    op: 'replace',
-    path: '/content',
+    oid: 'posts/1',
+    op: 'set',
+    name: 'content',
     content: 'Some new content',
   }
 ]
 [
   {
-    op: 'list.push',
-    path: '/tags',
+    oid: 'posts/1:tags:abcd',
+    op: 'list-push',
     value: 'react'
   }
 ]
@@ -155,44 +174,54 @@ Now in the meantime, back on version 1, Client B modifies the `content` and adds
 
 if we merge our operation histories in version order naively, we get some trouble.
 
-```
+```ts
 [
   {
-    op: 'replace',
-    path: '/title',
+    oid: 'posts/1',
+    op: 'set',
+    name: 'title',
     value: 'Initial post',
   }
 ]
 [
   {
-    op: 'replace',
-    path: '/content',
+    oid: 'posts/1',
+    op: 'set',
+    name: 'content',
     content: 'Some new content',
   }
 ]
 [
   {
-    op: 'list.push',
-    path: '/tags',
+    oid: 'posts/1:tags:abcd',
+    op: 'list-push',
     value: 'react'
   }
 ]
 [
   {
-    op: 'replace',
-    path: '/tags/0',
-    value: { name: 'dev', color: '#ff0000' }
+    oid: 'posts/1.tags.#:fghi',
+    op: 'init',
+    value: { name: 'dev', color: '#ff0000' },
   },
   {
-    op: 'add',
-    path: '/summary',
+    oid: 'posts/1.tags:abcd',
+    op: 'set',
+    name: 0,
+    value: { '@@type': 'ref', id: 'posts/1.tags.#:fghi' }
+  },
+  {
+    oid: 'posts/1',
+    op: 'set',
+    name: 'summary',
     value: ''
   },
 ]
 [
   {
-    op: 'replace',
-    path: '/summary',
+    oid: 'posts/1',
+    op: 'set',
+    name: 'summary',
     value: 'First post in my blog'
   }
 ]
@@ -219,9 +248,9 @@ Some notable things happened:
 - We managed to preserve the intent of adding the `react` tag
 - But we ended up with invalid data for the `tags` field
 
-However, there's an interesting moment in our history, right before Client A's migration operation, were we might have an opportunity to correct the error. At this point in history, our document is still in version 1 format, and looks like this
+However, there's an interesting moment in our history, right before Replica A's migration operation, were we might have an opportunity to correct the error. At this point in history, our document is still in version 1 format, and looks like this
 
-```
+```ts
 const post: Post = {
   id: 'xyz',
   title: 'Initial post',
@@ -233,23 +262,36 @@ const post: Post = {
 }
 ```
 
-When Client B performs its local migration, it will see this state as the final one before version 2. What if we have Client B perform its own local migration operation?
+When Replica B performs its local migration, it will see this state as the final one before version 2. What if we have Replica B perform its own local migration operation?
 
-```
+```ts
 [
   {
-    op: 'replace',
-    path: '/tags/0',
+    oid: 'posts/1.tags.#:lmno1234',
+    op: 'init',
     value: { name: 'dev', color: '#ff0000' }
   },
   {
-    op: 'replace',
-    path: '/tags/1',
-    value: { name: 'react', color: '#00ff00' }
+    oid: 'posts/1.tags:abcd',
+    op: 'set',
+    name: 0,
+    value: { '@@type': 'ref', id: 'posts/1.tags.#:lmno1234' }
   },
   {
-    op: 'add',
-    path: '/summary',
+    oid: 'posts/1.tags.#:qwer4356',
+    op: 'init',
+    value: { name: 'react', color: '#00ff00' }
+  },
+    {
+    oid: 'posts/1.tags:abcd',
+    op: 'set',
+    name: 1,
+    value: { '@@type': 'ref', id: 'posts/1.tags.#:qwer4356' }
+  },
+  {
+    oid: 'posts/1',
+    op: 'set',
+    name: 'summary',
     value: ''
   }
 ]
@@ -257,70 +299,118 @@ When Client B performs its local migration, it will see this state as the final 
 
 > Note: we assume color generation is deterministic, or randomness is acceptable.
 
-This patch would fix our problem, but there's an issue - Client B isn't migrating until well after Client A has made its own version 2 changes. Inserting the patch in clock order would reset the summary A wrote to `''` (JSON patch "add" will overwrite, despite "replace" existing... idk).
+This patch would fix our problem, but there's an issue - Replica B isn't migrating until well after Replica A has made its own version 2 changes. Inserting the patch in clock order would reset the summary A wrote to `''`.
 
 As long as we're messing with time, why not group migration operations together? After all, we have already assured that any data which a migration is operating on comes before the migration in history. That means we can safely move the operation which represents the migration itself backward as far as that point.
 
 To accomplish this we can tweak the timestamps for migration operations one last time and add a `\u0000` character after the version number - so they will all be the first operations for version 2, otherwise sorted in timestamp order.
 
-```
+```ts
 [
   {
-    op: 'replace',
-    path: '/title',
+    oid: 'posts/1',
+    op: 'set',
+    name: 'title',
     value: 'Initial post',
   }
 ]
 [
   {
-    op: 'replace',
-    path: '/content',
+    oid: 'posts/1',
+    op: 'set',
+    name: 'content',
     content: 'Some new content',
   }
 ]
 [
   {
-    op: 'list.push',
-    path: '/tags',
+    oid: 'posts/1:tags:abcd',
+    op: 'list-push',
     value: 'react'
   }
 ]
 [
   {
-    op: 'replace',
-    path: '/tags/0',
-    value: { name: 'dev', color: '#ff0000' }
+    oid: 'posts/1.tags.#:fghi',
+    op: 'init',
+    value: { name: 'dev', color: '#ff0000' },
   },
   {
-    op: 'add',
-    path: '/summary',
+    oid: 'posts/1.tags:abcd',
+    op: 'set',
+    name: 0,
+    value: { '@@type': 'ref', id: 'posts/1.tags.#:fghi' }
+  },
+  {
+    oid: 'posts/1',
+    op: 'set',
+    name: 'summary',
     value: ''
   },
 ]
 [
   {
-    op: 'replace',
-    path: '/tags/0',
+    oid: 'posts/1.tags.#:lmno1234',
+    op: 'init',
     value: { name: 'dev', color: '#ff0000' }
   },
   {
-    op: 'replace',
-    path: '/tags/1',
-    value: { name: 'react', color: '#00ff00' }
+    oid: 'posts/1.tags:abcd',
+    op: 'set',
+    name: 0,
+    value: { '@@type': 'ref', id: 'posts/1.tags.#:lmno1234' }
   },
   {
-    op: 'add',
-    path: '/summary',
+    oid: 'posts/1.tags.#:qwer4356',
+    op: 'init',
+    value: { name: 'react', color: '#00ff00' }
+  },
+    {
+    oid: 'posts/1.tags:abcd',
+    op: 'set',
+    name: 1,
+    value: { '@@type': 'ref', id: 'posts/1.tags.#:qwer4356' }
+  },
+  {
+    oid: 'posts/1',
+    op: 'set',
+    name: 'summary',
     value: ''
   }
 ]
 [
   {
-    op: 'replace',
-    path: '/summary',
+    oid: 'posts/1',
+    op: 'set',
+    name: 'summary',
     value: 'First post in my blog'
   }
 ]
 ```
 
 With this ordering, we've successfully migrated all our data and avoided overwriting values of version 2 operations as new clients come online!
+
+```ts
+const post: Post = {
+  id: 'xyz',
+  title: 'Initial post',
+  content: 'Some new content',
+  tags: [
+    { name: 'dev', color: '#ff0000' },
+    { name: 'react', color: '#00ff00' }
+  ],
+  summary: 'First post in my blog'
+}
+```
+
+### A final small problem
+
+I didn't catch this when originally implementing this migration algorithm, and it's not the end of the world, but there is a catch.
+
+Notice how, as part of the migration, we end up creating two copies of the `dev` tag. Each one is a distinct object. Replica B's migration overwrites the one created by Replica A - which is fine, since they're exactly the same.
+
+But this object 'lives on' in our history. It's essentially a ghost now, so we need some sort of logic to clean it up. I haven't done that yet!
+
+The good news is that deleting a document entirely will also delete all operations and baselines whose OIDs are prefixed by that document's OID - which means even those ghost objects will be deleted in the end. But for long-lived or immortal documents, you might see unnecessary storage clutter if your client makes shape-changing migrations like this frequently.
+
+On the other hand, such migrations aren't really that common. It's likely this bug will remain for a while since the priority isn't too high.

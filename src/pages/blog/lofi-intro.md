@@ -6,6 +6,11 @@ pubDate: "Sep 15 2022"
 heroImage: "/mariola-grobelska-n3JPNo11Aac-unsplash.jpg"
 ---
 
+> lo-fi series
+> 1. [The goal](/blog/lofi-intro)
+> 2. [Sync](/blog/lofi-sync)
+> 3. [Migrations](/blog/lofi-migrations)
+
 Over the past several years of my career I have developed a growing suspicion of scale.
 
 I think it's great that we can build such wide-reaching systems. And solving the problems that come with that can be very satisfying and introduce fascinating new concepts and ideas.
