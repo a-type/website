@@ -10,6 +10,7 @@ heroImage: "/mariola-grobelska-n3JPNo11Aac-unsplash.jpg"
 > 1. [The goal](/blog/lofi-intro)
 > 2. [Sync](/blog/lofi-sync)
 > 3. [Migrations](/blog/lofi-migrations)
+> 4. [Index queries](/blog/lofi-storage)
 
 Over the past several years of my career I have developed a growing suspicion of scale.
 

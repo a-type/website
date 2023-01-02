@@ -10,6 +10,7 @@ heroImage: "/resource-database-I12XKpvVz9g-unsplash.jpg"
 > 1. [The goal](/blog/lofi-intro)
 > 2. [Sync](/blog/lofi-sync)
 > 3. [Migrations](/blog/lofi-migrations)
+> 4. [Index queries](/blog/lofi-storage)
 
 Sync is a big part of the problem space for local web storage, and the core concepts which power it are relevant even to local-only scenarios. In this post I'll outline how I approached server-client sync for IndexedDB documents.
 

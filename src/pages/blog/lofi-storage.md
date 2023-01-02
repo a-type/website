@@ -92,7 +92,7 @@ This means how you define a compound index looks like this:
 and how you query it looks like this:
 
 ```
-{ match: ['category'], order: 'asc' }
+{ match: { category: 'development' }, order: 'asc' }
 ```
 
 There's no point in specifying ordered properties since you have to sort on everything.
