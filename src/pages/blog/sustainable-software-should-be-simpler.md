@@ -3,7 +3,7 @@ layout: ../../layouts/BlogPost.astro
 title: Sustainable software should be simpler
 description: I don't think we really need a fancy new model for this, just better scope.
 pubDate: 2022-12-3
-heroImage: /linh-le-ouFBfKDRPNw-unsplash.jpg
+heroImage: /images/blog/linh-le-ouFBfKDRPNw-unsplash.jpg
 ---
 
 Decentralization may be the latest cool idea, but [lo-fi](https://lo-fi.gfor.rest) is centralized, after a fashion. While the local-first aspects work entirely offline, in order to leverage synchronization and realtime features, you need to go through a server. It's not a new model. It's not fancy peer-to-peer. Users don't get 'full control over your own data and where it goes,' I guess. You've got one server to talk to (for now, at least), and you need permission to talk to it. In contrast to the hype around peer-to-peer in this space, this decision sometimes feels archaic, backward, even malicious.
@@ -30,6 +30,6 @@ To me this just all _feels_ more comfy, more just, and most of all, _simpler_. A
 >
 > My personal belief is that peer-to-peer design has obfuscated the core problems I'm outlining in this post behind a massive sea-change in implementation and constraints. That kind of system change requires re-defining the shape of the problem again before it can be solved in the new order; it doesn't eliminate it. Since my time and resources are limited, I've explicitly chosen to focus my efforts on defining the problem in the domain I'm already familiar with, make progress there, and start working on the solution.
 >
->In other words, I don't think it's impossible that decentralized tools will end up solving these problems, too. But I don't think their existence inherently gets us closer to solutions, and I don't think the old system prohibits those solutions, either.
+> In other words, I don't think it's impossible that decentralized tools will end up solving these problems, too. But I don't think their existence inherently gets us closer to solutions, and I don't think the old system prohibits those solutions, either.
 >
->That's enough for one footnote!
+> That's enough for one footnote!
