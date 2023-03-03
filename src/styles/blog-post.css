@@ -3,4 +3,5 @@
   object-fit: cover;
   border-radius: 8px;
   border-top-left-radius: 48px;
+  border-bottom: 1px solid #ddd;
 }

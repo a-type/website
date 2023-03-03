@@ -1,5 +1,6 @@
 ---
 import '../styles/blog-post.css';
+import { format } from 'date-fns';
 
 import BaseHead from '../components/BaseHead.astro';
 import Header from '../components/Header.astro';
@@ -52,11 +53,12 @@ const {
           )
         }
         <h1 class="title">{title}</h1>
-        {pubDate && <time>{pubDate}</time>}
+        {pubDate && <time>{format(new Date(pubDate), 'yyyy-MM-dd')}</time>}
         {
           updatedDate && (
             <div>
-              Last updated on <time>{updatedDate}</time>
+              Last updated on{' '}
+              <time>{format(new Date(updatedDate), 'yyyy-MM-dd')}</time>
             </div>
           )
         }

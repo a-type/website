@@ -11,6 +11,7 @@ heroImage: '/images/blog/susan-wilkinson-vnus9kq-96w-unsplash.jpg'
 > 1. [The goal](/blog/lofi-intro)
 > 2. [Sync](/blog/lofi-sync)
 > 3. [Migrations](/blog/lofi-migrations)
+> 4. [Index queries](/blog/lofi-storage)
 
 I have to tell you, after finally feeling like I'd figured out how to store, query, and sync data... Migrations nearly broke me!
 
