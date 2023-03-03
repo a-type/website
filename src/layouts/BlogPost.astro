@@ -4,6 +4,7 @@ import '../styles/blog-post.css';
 import BaseHead from '../components/BaseHead.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
+import Main from '../components/Main.astro';
 
 export interface Props {
   content: {
@@ -37,7 +38,7 @@ const {
 
   <body>
     <Header />
-    <main>
+    <Main>
       <article>
         {
           heroImage && (
@@ -62,7 +63,7 @@ const {
         <hr />
         <slot />
       </article>
-    </main>
+    </Main>
     <Footer />
   </body>
 </html>

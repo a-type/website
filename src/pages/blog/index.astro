@@ -1,0 +1,74 @@
+---
+import BaseHead from '../../components/BaseHead.astro';
+import Header from '../../components/Header.astro';
+import Footer from '../../components/Footer.astro';
+import { SITE_TITLE, SITE_DESCRIPTION, SHOW_FUTURE_POSTS } from '../../config';
+import Main from '../../components/Main.astro';
+
+// Use Astro.glob() to fetch all posts, and then sort them by date.
+const posts = (await Astro.glob('./*.{md,mdx}'))
+  .sort(
+    (a, b) =>
+      new Date(b.frontmatter.pubDate).valueOf() -
+      new Date(a.frontmatter.pubDate).valueOf(),
+  )
+  .filter(
+    (post) =>
+      SHOW_FUTURE_POSTS ||
+      new Date(post.frontmatter.pubDate).valueOf() < new Date().getTime(),
+  );
+---
+
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
+    <style>
+      ul {
+        list-style-type: none;
+        padding: unset;
+      }
+      ul li {
+        display: flex;
+      }
+      ul li time {
+        flex: 0 0 130px;
+        font-style: italic;
+        color: #888;
+      }
+      ul li a:visited {
+        color: #8e32dc;
+      }
+    </style>
+  </head>
+  <body>
+    <Header />
+    <Main>
+      <section>
+        <ul>
+          {
+            posts.map((post) => (
+              <li>
+                <time datetime={post.frontmatter.pubDate}>
+                  {new Date(post.frontmatter.pubDate).toLocaleDateString(
+                    'en-us',
+                    {
+                      year: 'numeric',
+                      month: 'short',
+                      day: 'numeric',
+                    },
+                  )}
+                </time>
+                <div>
+                  <a href={post.url}>{post.frontmatter.title}</a>
+                  <p>{post.frontmatter.description}</p>
+                </div>
+              </li>
+            ))
+          }
+        </ul>
+      </section>
+    </Main>
+    <Footer />
+  </body>
+</html>

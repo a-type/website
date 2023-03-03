@@ -1,12 +1,12 @@
 ---
-layout: "../../layouts/BlogPost.astro"
-title: "Compound index queries in IndexedDB"
-description: "hacking unicode for advanced querying"
-pubDate: "Dec 31 2022"
-heroImage: "/susan-wilkinson-vnus9kq-96w-unsplash.jpg"
+layout: '../../layouts/BlogPost.astro'
+title: 'Compound index queries in IndexedDB'
+description: 'hacking unicode for advanced querying'
+pubDate: 'Dec 31 2022'
 ---
 
 > lo-fi series
+>
 > 1. [The goal](/blog/lofi-intro)
 > 2. [Sync](/blog/lofi-sync)
 > 3. [Migrations](/blog/lofi-migrations)
@@ -28,23 +28,23 @@ Let's model a simple compound query, "items in category 'development' in ascendi
 
 ```ts
 interface Post {
-  id: string,
-  tags: string[],
-  category: string,
-  content: string,
-  published: boolean
+  id: string;
+  tags: string[];
+  category: string;
+  content: string;
+  published: boolean;
 }
 ```
 
 First, before storing each Post, we write a new 'invisible' value to it for our synthetic index. But what do we write to it so we can query it like above? Since IndexedDB only allows ordering and limiting on the entire value (not a subset, like just filtering on 'category' but sorting on 'id'), we need to be thoughtful about the structure of our value.
 
-```
+```ts
 const post = {
   id: cuid(),
   tags: ['react'],
   category: 'development',
   content: 'useEffect is back, baby!',
-  published: false
+  published: false,
 };
 
 post.category_id = `${post.category}\uFFFFFE${post.id}`;
@@ -104,7 +104,7 @@ It might feel dicey to match on 2 or more values with this hacky index setup! Do
 Consider a compound index `fieldA_fieldB_fieldC`, which we want to use to match `fieldA=foo` and `fieldB=bar` and sort by `fieldC, asc`. We would start by constructing the initial part of our index bound value:
 
 ```ts
-'foo\uFFFFFEbar'
+'foo\uFFFFFEbar';
 ```
 
 We want the upper and lower bound of the range of values which start with the above value, sorted ascending.
@@ -114,8 +114,8 @@ We want the upper and lower bound of the range of values which start with the ab
 We construct our lower and upper bounding values:
 
 ```ts
-const lower = 'foo\uFFFFFEbar\uFFFFFE\u0000'
-const upper = 'foo\uFFFFFEbar\uFFFFFF'
+const lower = 'foo\uFFFFFEbar\uFFFFFE\u0000';
+const upper = 'foo\uFFFFFEbar\uFFFFFF';
 ```
 
 The important part is that we should not see any values starting with `foo1\uFFFFFE...` or `foo\uFFFFFEbaa...` or `foo\uFFFFFEzzz...` sneak in. How do we know they wont? Let's go through them case by case (and more cases than these are covered in tests).

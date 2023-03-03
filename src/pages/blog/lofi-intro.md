@@ -1,12 +1,13 @@
 ---
-layout: "../../layouts/BlogPost.astro"
-title: "Towards small, local web apps"
+layout: '../../layouts/BlogPost.astro'
+title: 'Towards small, local web apps'
 description: "why I'm building a new system for web storage and sync"
-pubDate: "Sep 15 2022"
-heroImage: "/mariola-grobelska-n3JPNo11Aac-unsplash.jpg"
+pubDate: 'Sep 15 2022'
+heroImage: '/images/blog/mariola-grobelska-n3JPNo11Aac-unsplash.jpg'
 ---
 
 > lo-fi series
+>
 > 1. [The goal](/blog/lofi-intro)
 > 2. [Sync](/blog/lofi-sync)
 > 3. [Migrations](/blog/lofi-migrations)

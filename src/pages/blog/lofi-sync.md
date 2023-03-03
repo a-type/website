@@ -1,12 +1,13 @@
 ---
-layout: "../../layouts/BlogPost.astro"
-title: "Syncing local web app data"
-description: "one naive approach, at least"
-pubDate: "Sep 19 2022"
-heroImage: "/resource-database-I12XKpvVz9g-unsplash.jpg"
+layout: '../../layouts/BlogPost.astro'
+title: 'Syncing local web app data'
+description: 'one naive approach, at least'
+pubDate: 'Sep 19 2022'
+heroImage: '/images/blog/resource-database-I12XKpvVz9g-unsplash.jpg'
 ---
 
 > lo-fi series
+>
 > 1. [The goal](/blog/lofi-intro)
 > 2. [Sync](/blog/lofi-sync)
 > 3. [Migrations](/blog/lofi-migrations)

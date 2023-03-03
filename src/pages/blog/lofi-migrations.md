@@ -1,12 +1,13 @@
 ---
-layout: "../../layouts/BlogPost.astro"
-title: "Local-first data migrations"
-description: "now with time travel!"
-pubDate: "Nov 23 2022"
-heroImage: "/susan-wilkinson-vnus9kq-96w-unsplash.jpg"
+layout: '../../layouts/BlogPost.astro'
+title: 'Local-first data migrations'
+description: 'now with time travel!'
+pubDate: 'Nov 23 2022'
+heroImage: '/images/blog/susan-wilkinson-vnus9kq-96w-unsplash.jpg'
 ---
 
 > lo-fi series
+>
 > 1. [The goal](/blog/lofi-intro)
 > 2. [Sync](/blog/lofi-sync)
 > 3. [Migrations](/blog/lofi-migrations)
@@ -80,7 +81,7 @@ type Post = {
   content: string;
   tags: string[];
   title: string;
-}
+};
 ```
 
 now we migrate it to look like:
@@ -89,10 +90,10 @@ now we migrate it to look like:
 type Post = {
   id: string;
   content: string;
-  tags: { name: string, color: string }[];
+  tags: { name: string; color: string }[];
   title: string;
   summary: string;
-}
+};
 ```
 
 So we've expanded tags into an object, and added `summary`. We'll be working with a document baseline for version 1:
@@ -103,7 +104,7 @@ const post: Post = {
   content: 'Hello world',
   tags: ['dev'],
   title: 'First post',
-}
+};
 ```
 
 For a contrived example, let's suppose Replica A changed the `title` field to `'Initial post'`, then migrated the post up to version 2, running a routine which converted the string tags into tags with colors and adding a blank `summary` field. Then Replica A fills in their summary.
@@ -161,15 +162,14 @@ Now in the meantime, back on version 1, Replica B modifies the `content` and add
     op: 'set',
     name: 'content',
     content: 'Some new content',
-  }
-]
-[
+  },
+][
   {
     oid: 'posts/1:tags:abcd',
     op: 'list-push',
-    value: 'react'
+    value: 'react',
   }
-]
+];
 ```
 
 if we merge our operation histories in version order naively, we get some trouble.
@@ -234,12 +234,9 @@ const post: Post = {
   id: 'xyz',
   title: 'Initial post',
   content: 'Some new content',
-  tags: [
-    { name: 'dev', color: '#ff0000' },
-    'react'
-  ],
-  summary: 'First post in my blog'
-}
+  tags: [{ name: 'dev', color: '#ff0000' }, 'react'],
+  summary: 'First post in my blog',
+};
 ```
 
 Some notable things happened:
@@ -255,11 +252,8 @@ const post: Post = {
   id: 'xyz',
   title: 'Initial post',
   content: 'Some new content',
-  tags: [
-    'dev',
-    'react'
-  ],
-}
+  tags: ['dev', 'react'],
+};
 ```
 
 When Replica B performs its local migration, it will see this state as the final one before version 2. What if we have Replica B perform its own local migration operation?
@@ -269,32 +263,32 @@ When Replica B performs its local migration, it will see this state as the final
   {
     oid: 'posts/1.tags.#:lmno1234',
     op: 'init',
-    value: { name: 'dev', color: '#ff0000' }
+    value: { name: 'dev', color: '#ff0000' },
   },
   {
     oid: 'posts/1.tags:abcd',
     op: 'set',
     name: 0,
-    value: { '@@type': 'ref', id: 'posts/1.tags.#:lmno1234' }
+    value: { '@@type': 'ref', id: 'posts/1.tags.#:lmno1234' },
   },
   {
     oid: 'posts/1.tags.#:qwer4356',
     op: 'init',
-    value: { name: 'react', color: '#00ff00' }
+    value: { name: 'react', color: '#00ff00' },
   },
-    {
+  {
     oid: 'posts/1.tags:abcd',
     op: 'set',
     name: 1,
-    value: { '@@type': 'ref', id: 'posts/1.tags.#:qwer4356' }
+    value: { '@@type': 'ref', id: 'posts/1.tags.#:qwer4356' },
   },
   {
     oid: 'posts/1',
     op: 'set',
     name: 'summary',
-    value: ''
-  }
-]
+    value: '',
+  },
+];
 ```
 
 > Note: we assume color generation is deterministic, or randomness is acceptable.
@@ -397,10 +391,10 @@ const post: Post = {
   content: 'Some new content',
   tags: [
     { name: 'dev', color: '#ff0000' },
-    { name: 'react', color: '#00ff00' }
+    { name: 'react', color: '#00ff00' },
   ],
-  summary: 'First post in my blog'
-}
+  summary: 'First post in my blog',
+};
 ```
 
 ### A final small problem

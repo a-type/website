@@ -1,27 +1,30 @@
 ---
 import HeaderLink from './HeaderLink.astro';
 import { SITE_TITLE } from '../config';
+import Links from './Links.astro';
 ---
 
 <header>
-  <h2>
-    {SITE_TITLE}
-  </h2>
-  <nav>
-    <HeaderLink href="/">Posts</HeaderLink>
-    <HeaderLink href="https://twitter.com/gaforres" target="_blank"
-      >Twitter</HeaderLink
-    >
-    <HeaderLink href="https://github.com/a-type" target="_blank"
-      >GitHub</HeaderLink
-    >
-  </nav>
+  <a href="/"
+    ><h2>
+      {SITE_TITLE}
+    </h2>
+  </a>
+  <Links />
 </header>
 <style>
   header {
     margin: 0em 0 2em;
+    padding: 2rem;
   }
   h2 {
     margin: 0.5em 0;
+    font-family: 'Cormorant', serif;
+    font-weight: 100;
+    font-style: italic;
+  }
+  a {
+    color: inherit;
+    text-decoration: none;
   }
 </style>

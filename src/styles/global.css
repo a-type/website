@@ -3,17 +3,46 @@
   https://github.com/HermanMartinus/bearblog/blob/297026a877bc2ab2b3bdfbd6b9f7961c350917dd/templates/styles/blog/default.css
   License MIT: https://github.com/HermanMartinus/bearblog/blob/master/LICENSE.md
  */
+
+@font-face {
+  font-family: 'Cormorant';
+  src: url('/fonts/Cormorant-VariableFont_wght.ttf')
+    format('truetype-variations');
+  font-weight: 1 999;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Cormorant';
+  src: url('/fonts/Cormorant-Italic-VariableFont_wght.ttf')
+    format('truetype-variations');
+  font-weight: 1 999;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Inter';
+  src: url('/fonts/Inter-VariableFont_slnt,wght.ttf') format('ttf');
+  font-weight: 1 999;
+  font-style: oblique 0deg 5deg;
+  font-display: swap;
+}
+
 body {
-	font-family: Verdana, sans-serif;
-	margin: auto;
-	padding: 20px;
-	max-width: 65ch;
-	text-align: left;
-	background-color: #fff;
-	word-wrap: break-word;
-	overflow-wrap: break-word;
-	line-height: 1.5;
-	color: #444;
+  font-family: Inter, Arial, Helvetica, sans-serif;
+  margin: auto;
+  max-width: 65ch;
+  text-align: left;
+  background-color: #fff;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  line-height: 1.5;
+  color: #444;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
 }
 h1,
 h2,
@@ -23,53 +52,53 @@ h5,
 h6,
 strong,
 b {
-	color: #222;
+  color: #222;
 }
 a {
-	color: #3273dc;
+  color: #3273dc;
 }
 nav a {
-	margin-right: 10px;
+  margin-right: 10px;
 }
 textarea {
-	width: 100%;
-	font-size: 16px;
+  width: 100%;
+  font-size: 16px;
 }
 input {
-	font-size: 16px;
+  font-size: 16px;
 }
 content {
-	line-height: 1.6;
+  line-height: 1.6;
 }
 table {
-	width: 100%;
+  width: 100%;
 }
 img {
-	max-width: 100%;
-	height: auto;
+  max-width: 100%;
+  height: auto;
 }
 code {
-	padding: 2px 5px;
-	background-color: #f2f2f2;
+  padding: 2px 5px;
+  background-color: #f2f2f2;
 }
 pre {
-	padding: 1rem;
+  padding: 1rem;
 }
 pre > code {
-	all: unset;
+  all: unset;
 }
 blockquote {
-	border: 1px solid #999;
-	color: #222;
-	padding: 2px 0px 2px 20px;
-	margin: 0px;
-	font-style: italic;
+  border: 1px solid #999;
+  color: #222;
+  padding: 2px 20px;
+  margin: 0px;
+  font-style: italic;
 }
 hr {
-	border: 0;
-	border-top: 1px solid #ccc;
-	margin: 20px 0px;
-	height: 120px;
-	background: linear-gradient(#eee, transparent);
-	border-radius: 8px;
+  border: 0;
+  border-top: 1px solid #ccc;
+  margin: 20px 0px;
+  height: 120px;
+  background: linear-gradient(#eee, transparent);
+  border-radius: 8px;
 }
