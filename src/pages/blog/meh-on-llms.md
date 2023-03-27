@@ -1,0 +1,27 @@
+---
+layout: ../../layouts/BlogPost.astro
+title: "Meh: Where I'm at on the bold claims of coding LLMs"
+description:
+pubDate: 2023-03-27
+heroImage:
+---
+
+Hype continues to build around LLM-based tooling in the coding space and promised productivity, but for some reason I can't muster up the enthusiasm I see among many of my peers.
+
+I definitely fall in the "meh" category, although I'm willing to concede it's more of an emotional lack-of-capacity-to-care than any particular skepticism about whether these tools really will 5/10x productivity (could totally happen. I'd say Copilot has already 2x'd me by certain definitions).
+
+One thing I am concretely skeptical of, though, is the mental model surrounding the meaning and central nature of _code_ which is assumed when people are talking about LLMs in these spaces. It's been a meme for so long that the code is the 'source of truth,' and in a sense that's correct (the code is what the computer will run, the root source of the program's behavior) but in another sense I think it's a limited philosophy that is facing some compelling push-back (here I will yet again reference [Future of Coding](https://futureofcoding.org/episodes/061)).
+
+I'm becoming more and more amenable to the idea that code is merely an artifact of the actual _theory_ of the program, which is incommunicable but lives (i.e. is a living idea) inside the collective minds of the people creating it. And I wonder if an LLM is capable of joining that collective, or if it's only able to interact with the artifact, the code.
+
+We could imagine a codebase as having a realized bias _away_ from the true theory of the program. For example, a particular engineer was responsible for some core system but fundamentally misunderstood the brief. The code they wrote is serviceable and manages to implement the key tasks required, but the model it encodes is not aligned with the actual long-term product. Does an LLM understand enough to correct this bias in its recommendations, or will it reinforce it instead? The way these tools work makes me assume the latter.
+
+Another common scenario is a codebase which has survived several product pivots but continues to shamble forward, repurposing or outright abusing its older misaligned systems to accomplish a goal unforeseen by their creators. Yet those creators are often also the ones doing the mangling. A lot rides on the dissonance such teams can hold together as they push toward a new product vision on the back of their prior work. Somehow we humans are able to tether all these conflicting theories into one working conceptual product, although not always successfully or without later fallout. But does the LLM know that, despite the fact we've used the `users` table to store company information for the past year of 'hustling,' it's now beyond time to properly refactor the data model before the house of cards comes crashing down? Is it capable of ignoring a 100% reinforcement that corporations are, in fact, people?
+
+I am of course speculating about legacy codebases being injected with AI-powered rocket fuel, and that's an easy target. But what I'm curious about, behind these obvious examples, is whether the "10xing" will not only careen such products off a technical debt cliff, but also amplify the little blips in _technically ok_ products which would otherwise have been perfectly survivable.
+
+And even beyond that, if this is just one class of a larger problem that will manifest in other ways: namely, that belief that the code is the product, and that all the product needs to manifest is an idea and the code to implement it. This sort of implies there's only one necessary step from Idea to Product (write the correct code), and all of the steps the LLM helps us shortcut over were simply wasted effort.
+
+Here's another take for you: how often have I done research trying to determine the right way to build an idea, only to discover an alternative perspective which completely changed my approach? Just yesterday I was tinkering with building a mini web framework using esbuild, but I gradually realized as I pored over Github discussions and documentation that while it was the right tool for the job I set out to do, _the job I set out to do was not the right solution to my problem_. In fact, I learned why the solution I already had was more correct than my own idea. Perhaps an AI will be capable of this kind of meta-conversation, but I haven't yet seen the spark of that in current examples - which would probably have helped me implement the wrong solution very effectively.
+
+I get the feeling I'm looking at this the wrong way, which happens to me quite often when it comes to new high-level ideas. Until I've experienced some concrete examples of problems and solutions, it's hard for me to buy in. So for now, I'll be keeping an eye on things and dabbling around wherever something feels directly applicable to my existing goals (like Copilot). At the rate things are going, who knows, I could be changing my tune quite soon. For example, what if I reframed the previous paragraph not as LLMs allowing me to skip a vital decision-making process, but instead as them shortening the loop between a theory and its validation? What if instead of learning esbuild was the wrong tool via research, I saw it firsthand in my AI-implemented framework within a few minutes? While this framing is far more optimistic, I still think the simple question, "would I be better off?" is worth asking, and not definitively answered.
