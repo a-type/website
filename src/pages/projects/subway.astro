@@ -1,0 +1,27 @@
+---
+import BaseHead from '../../components/BaseHead.astro';
+import { SubwayScene } from '../../components/subway/SubwayScene';
+import { MusicPlayer } from '../../components/subway/MusicPlayer';
+---
+
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <BaseHead title="Subway Scene" description="" />
+  </head>
+  <body>
+    <style>
+      html,
+      body {
+        width: 100vw;
+        height: 100vh;
+        margin: 0;
+        display: flex;
+        flex-direction: column;
+        max-width: unset !important;
+      }
+    </style>
+    <SubwayScene client:only="react" />
+    <MusicPlayer client:only="react" />
+  </body>
+</html>

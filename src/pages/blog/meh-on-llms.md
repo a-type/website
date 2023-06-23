@@ -1,7 +1,7 @@
 ---
 layout: ../../layouts/BlogPost.astro
-title: "Meh: Where I'm at on the bold claims of coding LLMs"
-description:
+title: "Where I'm at on the bold claims of coding LLMs"
+description: Thoughts on the theory and practice of coding
 pubDate: 2023-03-27
 heroImage:
 ---
