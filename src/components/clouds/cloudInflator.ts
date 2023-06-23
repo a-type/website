@@ -1,5 +1,5 @@
 import tumult from 'tumult';
-import * as random from 'seedrandom';
+import random from 'seedrandom';
 import { setValue, getValue } from './voxelField';
 
 /**
@@ -170,7 +170,7 @@ function generateSphere(radius: number) {
   return values;
 }
 
-export default function(
+export default function (
   field: Float32Array,
   size: number,
   inflationPasses: number = 2,

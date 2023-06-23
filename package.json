@@ -30,6 +30,7 @@
     "tumult": "^3.0.14"
   },
   "devDependencies": {
+    "@types/seedrandom": "^3.0.5",
     "@types/three": "^0.152.1"
   }
 }
