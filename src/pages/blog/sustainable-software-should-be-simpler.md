@@ -4,6 +4,7 @@ title: Sustainable software should be simpler
 description: I don't think we really need a fancy new model for this, just better scope.
 pubDate: 2022-12-3
 heroImage: /images/blog/linh-le-ouFBfKDRPNw-unsplash.jpg
+heroCredit: 'Linh Le on Unsplash'
 ---
 
 Decentralization may be the latest cool idea, but [lo-fi](https://lo-fi.gfor.rest) is centralized, after a fashion. While the local-first aspects work entirely offline, in order to leverage synchronization and realtime features, you need to go through a server. It's not a new model. It's not fancy peer-to-peer. Users don't get 'full control over your own data and where it goes,' I guess. You've got one server to talk to (for now, at least), and you need permission to talk to it. In contrast to the hype around peer-to-peer in this space, this decision sometimes feels archaic, backward, even malicious.

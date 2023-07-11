@@ -4,6 +4,7 @@ title: 'Local-first data migrations'
 description: 'now with time travel!'
 pubDate: 'Nov 23 2022'
 heroImage: '/images/blog/susan-wilkinson-vnus9kq-96w-unsplash.jpg'
+heroCredit: 'Susan Wilkinson on Unsplash'
 ---
 
 > lo-fi series

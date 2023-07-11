@@ -4,6 +4,7 @@ title: 'Syncing local web app data'
 description: 'one naive approach, at least'
 pubDate: 'Sep 19 2022'
 heroImage: '/images/blog/resource-database-I12XKpvVz9g-unsplash.jpg'
+heroCredit: 'Resource Database on Unsplash'
 ---
 
 > lo-fi series

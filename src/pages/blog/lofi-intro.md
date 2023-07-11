@@ -4,6 +4,7 @@ title: 'Towards small, local web apps'
 description: "why I'm building a new system for web storage and sync"
 pubDate: 'Sep 15 2022'
 heroImage: '/images/blog/mariola-grobelska-n3JPNo11Aac-unsplash.jpg'
+heroCredit: 'Mariola Grobelska on Unsplash'
 ---
 
 > lo-fi series

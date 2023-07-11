@@ -1,6 +1,5 @@
 ---
 import '../styles/blog-post.css';
-import { format } from 'date-fns';
 
 import BaseHead from '../components/BaseHead.astro';
 import Header from '../components/Header.astro';
@@ -14,11 +13,12 @@ export interface Props {
     pubDate?: string;
     updatedDate?: string;
     heroImage?: string;
+    heroCredit?: string;
   };
 }
 
 const {
-  content: { title, description, pubDate, updatedDate, heroImage },
+  content: { title, description, pubDate, updatedDate, heroImage, heroCredit },
 } = Astro.props;
 ---
 
@@ -29,6 +29,12 @@ const {
       .title {
         font-size: 2em;
         margin: 0.25em 0 0;
+      }
+      .credit {
+        font-size: 0.6em;
+        margin: 0;
+        font-style: italic;
+        color: #888;
       }
       hr {
         border-top: 1px solid #ddd;
@@ -43,22 +49,41 @@ const {
       <article>
         {
           heroImage && (
-            <img
-              width={720}
-              height={360}
-              class="hero-image"
-              src={heroImage}
-              alt=""
-            />
+            <>
+              <img
+                width={720}
+                height={360}
+                class="hero-image"
+                src={heroImage}
+                alt={heroCredit}
+              />
+              <p class="credit">Photo by {heroCredit}</p>
+            </>
           )
         }
         <h1 class="title">{title}</h1>
-        {pubDate && <time>{format(new Date(pubDate), 'yyyy-MM-dd')}</time>}
+        {
+          pubDate && (
+            <time>
+              {new Date(pubDate).toLocaleDateString('en-us', {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric',
+              })}
+            </time>
+          )
+        }
         {
           updatedDate && (
             <div>
               Last updated on{' '}
-              <time>{format(new Date(updatedDate), 'yyyy-MM-dd')}</time>
+              <time>
+                {new Date(updatedDate).toLocaleDateString('en-us', {
+                  year: 'numeric',
+                  month: 'short',
+                  day: 'numeric',
+                })}
+              </time>
             </div>
           )
         }
