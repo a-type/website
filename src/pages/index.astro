@@ -55,13 +55,10 @@ import ShowcaseItem from '../components/ShowcaseItem.astro';
       <p>
         got started in enterprise dashboards, moonlit in <ExternalLink
           href="https://github.com/a-type?tab=repositories&type=source"
-        >
-          open source
-        </ExternalLink>, and then jumped straight into <ExternalLink
-          href="https://popspace.io"
-        >
-          spatial canvas
-        </ExternalLink>. Now I'm working on
+          >open source</ExternalLink
+        >, and then jumped straight into <ExternalLink
+          href="https://popspace.io">spatial canvas</ExternalLink
+        >. Now I'm working on
       </p>
       <h2>local-first apps</h2>
       <Showcase>
@@ -81,22 +78,21 @@ import ShowcaseItem from '../components/ShowcaseItem.astro';
       <h2>...and more</h2>
       <ul>
         <li>
-          <a
+          <ExternalLink
             href="https://popstage.com"
             target="_blank"
-            rel="noopener noreferrer"
+            rel="noopener noreferrer">PopStage</ExternalLink
           >
-            PopStage | Collaborative workshop venue
-          </a>
+          <span> | Collaborative workshop venue</span>
         </li>
         <li>
-          <a
-            href="https://popspace.io"
-            target="_blank"
-            rel="noopener noreferrer"
+          <ExternalLink href="https://popspace.io">PopSpace</ExternalLink>
+          <span> | Online spatial meeting spaces&nbsp;</span>
+          <ExternalLink
+            href="https://www.loom.com/share/3c010e7b79114695a5b356579aafb1b7?sid=6ea72b48-af76-4b4d-94cb-2ba38f9f4ad1"
           >
-            PopSpace | Online spatial meeting spaces
-          </a>
+            (Demo and technical overview)
+          </ExternalLink>
         </li>
         <li>
           <a href="/projects/subway"
