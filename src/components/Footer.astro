@@ -1,13 +1,18 @@
 ---
+import JobNote from './JobNote.astro';
 const today = new Date();
 ---
 
 <footer>
-	&copy; {today.getFullYear()} Grant Forrest. All rights reserved.
+	<div>&copy; {today.getFullYear()} Grant Forrest. All rights reserved.</div>
+	<JobNote />
 </footer>
 <style>
 	footer {
 		padding: 25px;
 		text-align: center;
+	}
+	div {
+		font-size: 0.9rem;
 	}
 </style>

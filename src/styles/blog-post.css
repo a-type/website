@@ -5,3 +5,10 @@
   border-top-left-radius: 48px;
   border-bottom: 1px solid #ddd;
 }
+
+caption {
+  font-size: 0.8rem;
+  color: #777;
+  margin: 0.5rem 0;
+  font-style: italic;
+}

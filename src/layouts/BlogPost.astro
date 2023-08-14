@@ -22,75 +22,71 @@ const {
 } = Astro.props;
 ---
 
-<html>
-  <head>
-    <BaseHead title={title} description={description} />
-    <style>
-      .title {
-        font-size: 2em;
-        margin: 0.25em 0 0;
-      }
-      .credit {
-        font-size: 0.6em;
-        margin: 0;
-        font-style: italic;
-        color: #888;
-      }
-      hr {
-        border-top: 1px solid #ddd;
-        margin: 1rem 0;
-      }
-    </style>
-  </head>
+<style>
+  .title {
+    font-size: 2em;
+    margin: 0.25em 0 0;
+  }
+  .credit {
+    font-size: 0.6em;
+    margin: 0;
+    font-style: italic;
+    color: #888;
+  }
+  hr {
+    border-top: 1px solid #ddd;
+    margin: 1rem 0;
+  }
+</style>
+<BaseHead title={title} description={description} />
 
-  <body>
-    <Header />
-    <Main>
-      <article>
-        {
-          heroImage && (
-            <>
-              <img
-                width={720}
-                height={360}
-                class="hero-image"
-                src={heroImage}
-                alt={heroCredit}
-              />
-              <p class="credit">Photo by {heroCredit}</p>
-            </>
-          )
-        }
-        <h1 class="title">{title}</h1>
-        {
-          pubDate && (
+<body>
+  <Header />
+  <Main>
+    <article>
+      {
+        heroImage && (
+          <>
+            <img
+              width={720}
+              height={360}
+              class="hero-image"
+              src={heroImage}
+              alt={heroCredit}
+            />
+            <p class="credit">Photo by {heroCredit}</p>
+          </>
+        )
+      }
+      <h1 class="title">{title}</h1>
+      {
+        pubDate && (
+          <time>
+            {new Date(pubDate).toLocaleDateString('en-us', {
+              year: 'numeric',
+              month: 'short',
+              day: 'numeric',
+            })}
+          </time>
+        )
+      }
+      {
+        updatedDate && (
+          <div>
+            Last updated on{' '}
             <time>
-              {new Date(pubDate).toLocaleDateString('en-us', {
+              {new Date(updatedDate).toLocaleDateString('en-us', {
                 year: 'numeric',
                 month: 'short',
                 day: 'numeric',
               })}
             </time>
-          )
-        }
-        {
-          updatedDate && (
-            <div>
-              Last updated on{' '}
-              <time>
-                {new Date(updatedDate).toLocaleDateString('en-us', {
-                  year: 'numeric',
-                  month: 'short',
-                  day: 'numeric',
-                })}
-              </time>
-            </div>
-          )
-        }
-        <hr />
-        <slot />
-      </article>
-    </Main>
-    <Footer />
-  </body>
-</html>
+          </div>
+        )
+      }
+      <hr />
+      <slot />
+    </article>
+  </Main>
+  <Footer />
+</body>

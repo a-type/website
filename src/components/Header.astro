@@ -1,7 +1,7 @@
 ---
-import HeaderLink from './HeaderLink.astro';
 import { SITE_TITLE } from '../config';
 import Links from './Links.astro';
+import JobNote from './JobNote.astro';
 ---
 
 <header>
@@ -10,6 +10,7 @@ import Links from './Links.astro';
       {SITE_TITLE}
     </h2>
   </a>
+  <JobNote />
   <Links />
 </header>
 <style>

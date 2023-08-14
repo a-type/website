@@ -1,0 +1,691 @@
+---
+layout: '../../layouts/BlogPost.astro'
+title: 'The comprehensive guide to making your web app feel native'
+description: 'A deep dive into building a solid PWA and the UX tricks to employ that make native apps feel native'
+pubDate: 'Aug 15 2023'
+---
+
+import FitImage from '../../components/FitImage.astro';
+import Video from '../../components/Video.astro';
+import Caption from '../../components/Caption.astro';
+export const components = { img: FitImage };
+
+When it comes to apps, the web always feels a little second-class.
+
+Sure, we’ve had some advancements in the web platform which make it more capable of powering app-like experiences. Greater device access, “install” options on phones, share targets, and the like have all made web apps feel more native. But these advances on their own won’t convince a user that your web-based product is on par with a native app. More work goes into thoughtfully designing that experience before the lines start to blur. That’s what I’ll be covering here.
+
+But first, for the native elitists… yeah, I know a single-threaded browser view has some hard limits in terms of raw ability to compete with an optimized, native app. But for relatively simple apps on most phones, with a little effort it can be hard for most users to tell the difference. Real-world experience is what matters here, not theoretical technical differences.
+
+Also, this isn’t the kind of post where I’m going to give you a bunch of code to copy and try. Most of this stuff is highly dependent on how your app works. What I’m going over here are _principles_, the implementation is up to you.
+
+# It starts with a PWA
+
+This almost goes without saying, but you need a PWA (Portable Web App) to get things started. That means you need two things: a service worker, and a manifest.
+
+## The Service Worker
+
+The service worker doesn’t have to be particularly fancy to get started, but in order to really nail the native feeling, we’re going to go the extra mile and _precache our application for offline use._ All HTML, JS, and (optionally) media assets can be downloaded once, then loaded from disk instead of network for future launches. That’ll make loads much faster for repeated use, and even (if your application supports it… more later) let the user use your app while their data connection is spotty.
+
+### Precaching client files and offline support
+
+I’ll note that you _can_ have a service worker which just has an “offline” page that shows up whenever the user isn’t able to connect, but this is an article about making your app feel native, and native apps don’t do that. So we can’t stop there.
+
+Luckily, there are plenty of great tools like Workbox which help us deal with service worker precaching without having to be an expert on service workers. And there are even integrations with builders like Webpack or Vite that will automatically detect our app assets and generate a “precache manifest” for us! I highly recommend this. In fact, I use these exclusively, so I can’t even really explain to you how to do it at a lower level. A little lazy of me as an author, I know, but my goal is to make functional apps, not know all the minute inner workings for their own sake. Tools like Workbox or `vite-plugin-pwa` haven’t let me down.
+
+The important thing to know at a high level is that we need to gather up a list of every URL that our app needs to request (whether it be an HTML, JS, CSS, or asset file) that we want to be available offline, and register those in our service worker.
+
+When those change, which always happens when you change your app code or swap out an image, we re-generate that list. This changes the actual code of our service worker, because it’s using that list (often just an inline array of strings) within its own code. The browser notices the service worker code is different, and from there we can pre-fetch those new assets, cache them, and prepare to update the app.
+
+## App updates
+
+This is a big one that folks getting started in PWAs underestimate. Probably because this is one of the biggest ways PWAs differ from a traditional web-based experience. Instead of the user always loading the latest version of your client files after you push an update, they’ll still be on the older version the next time they launch the app, since we’ve _precached_ those files.
+
+It’s only after the app loads up on the old, precached version, that it will fetch the new version in the background. This often takes a second or more. Then, you have a chance to manually initiate an update of the app in your code. That looks like this, usually:
+
+```jsx
+// In your service worker file:
+
+// This allows the web app to trigger skipWaiting via
+// registration.waiting.postMessage({type: 'SKIP_WAITING'})
+self.addEventListener('message', (event) => {
+  if (event.data && event.data.type === 'SKIP_WAITING') {
+    self.skipWaiting();
+  }
+});
+```
+
+We add an event handler in the service worker file to listen for messages from the main client. If the client sends a `SKIP_WAITING` message, that means “don’t wait for the right time to update the app code; let’s update it now!” If you don’t do this, even refreshing will still stick with the old, precached version of your app.
+
+On the client, we do this when we’re ready to update:
+
+```jsx
+// tell the service worker to install immediately so we're ready with the new app
+// on next page load
+function updateApp() {
+  navigator.serviceWorker.controller?.postMessage({ type: 'SKIP_WAITING' });
+}
+
+// listen for the install, reload the page when ready
+let refreshing = false;
+navigator.serviceWorker.addEventListener('controllerchange', () => {
+  if (refreshing) return;
+  refreshing = true;
+  window.location.reload();
+});
+```
+
+What this means for you, practically, is that you have to decide how to get the user on your new app version, and how urgent that is. There are a few common strategies, but for all of them I’ll be using this helper function to listen for incoming updates:
+
+```jsx
+function onUpdateReady(callback) {
+  navigator.serviceWorker
+    .register('/service-worker.js')
+    .then((registration) => {
+      registration.addEventListener('updatefound', () => {
+        registration.installing.onstatechange = function () {
+          // No arrow function because 'this' is needed.
+          if (this.state == 'installed') {
+            if (!navigator.serviceWorker.controller) {
+              console.log('First install for this service worker.');
+            } else {
+              callback();
+            }
+          }
+        };
+      });
+    });
+}
+```
+
+If you’re using a service worker helper library like Workbox (which I highly recommend doing), there may be versions of these helpers already available to you. Read the docs!
+
+### Update strategies
+
+**Update immediately when available.** This refreshes the page without user input. It might be seamless enough if your app is very small, but as the download size becomes larger, the delay from launch to unexpected refresh gets long enough to become actively disruptive. I don’t recommend it.
+
+```jsx
+onUpdateReady(updateApp);
+```
+
+**Show an update prompt when the update is available.** This might be the most common approach, and you’ll see it often in more mature web apps. Usually takes the form of a small, dismissible popup in the corner with a call to action to update and refresh.
+
+```jsx
+onUpdateReady(() => {
+  showInstallPrompt();
+});
+
+onInstallPromptClick(updateApp);
+```
+
+**Wait for navigation and update.** I don’t actually know if many people besides me do this, but basically I wait for the user to click a link, and if an update is ready to install, I interrupt the normal navigation and do an update and reload. In my app, a navigation event is a reasonable time to briefly interrupt the user which won’t be frustrating or disorienting.
+
+```jsx
+let updateAvailable = false;
+
+onUpdateReady(() => {
+  updateAvailable = true;
+});
+
+// in each link you want to trigger updates...
+link.addEventListener('click', (ev) => {
+  if (updateAvailable) {
+    ev.preventDefault();
+    updateApp();
+  }
+});
+```
+
+**Wait for next launch to update.** If there’s really no rush to update, you can always wait until the user closes the app completely. The browser will automatically launch the latest version when they come back. No code needed for this one, but keep in mind that it’s up to the browser how it will decide when the app is ‘closed’ and ready to update; it may keep tabs in memory long after the browser app has been backgrounded.
+
+### Be careful with server-side features
+
+One big reason you may want the user to update sooner rather than later is if your app relies on server-side APIs or realtime features. You might push a change to how these features work which is incompatible with older client versions. With PWA, even though the new version is downloaded and ready to install, the user won’t know there’s an update until you tell them. If you don’t tell them, but the client starts breaking due to server-side incompatibility, the user will assume your app is broken.
+
+If your app relies on server-side features which could be incompatible during a version change, I’d recommend one or both of these strategies:
+
+1. **Always support backwards-compatibility for a certain time period.** Give your users some time to update the app via the methods above. Keep in mind that users who don’t update in this time period may still experience problems.
+2. **Decide on an error code which indicates an update is required.** You can standardize some error code in your API payloads which your client will see and recognize that it needs to prompt the user to update ASAP. This can trigger a mandatory modal which initiates the update process, or just reload the page outright.
+
+> Can I just say, for a moment, before we move on—despite how much harder this update process is for a beginner to grok, I think it’s really cool that we get **this much control** over how our apps update on the web. We don’t even have to wait until the user closes the app to load in new code! While often PWA update implementations are clunky, with a bit of work I think you can create a great experience.
+
+## The Manifest
+
+The manifest gives us nice integration features with the host OS and browser. We can specify a color for the browser chrome (`theme_color`) and add nice icons for different occasions.
+
+### Icons
+
+Different sizes of icons are important to look good in a variety of contexts. Not much to say about these, and if you’ve ever followed a PWA tutorial you already know about them. I recommend using [a tool to generate these from a source icon](https://www.pwabuilder.com/imageGenerator) rather than making them manually.
+
+### Maskable icon
+
+It’s important to add a maskable icon if you want your app’s homescreen icon to look good, especially on Android. Normal icons will get shoved inside a white circle in Android’s launcher, which makes it really obvious which apps are PWAs, and generally looks bad. But the maskable icon doesn’t!
+
+Your maskable icon should have ample space around the outside so that it can adapt to different icon shapes. It must also have a solid background.
+
+For more specifics, you should definitely [check out the documentation.](https://web.dev/maskable-icon/)
+
+### Install screenshots
+
+![A screenshot of a PWA install prompt which has several app screenshots as part of the install page](/images/blog/pwa-native/install-screenshots.png)
+
+Here’s a hidden gem for PWAs (well, Android PWAs… opened in Chrome…): you can set up fancy, App-Store-like screenshot previews of your app that show up right in the PWA install prompt! Although the use case is very platform-limited, Chrome users will get a really slick install experience if you add some screenshots to your manifest.
+
+```json
+screenshots: [
+	{
+		src: 'images/screenshots/list.png',
+		type: 'image/png',
+		sizes: '1170x2532',
+	},
+	{
+		src: 'images/screenshots/recipe_overview.png',
+		type: 'image/png',
+		sizes: '1170x2532',
+	},
+	{
+		src: 'images/screenshots/cooking.png',
+		type: 'image/png',
+		sizes: '1170x2532',
+	},
+]
+```
+
+# System color scheme
+
+Users expect native apps to integrate well with the OS, and one way to fulfill that on the web is to inherit your light/dark mode configuration from the device.
+
+What that means in practice is utilizing the `@media(prefers-colors-scheme: dark)` and `@media(prefers-color-scheme: light)` media queries when defining your theme styles. Beyond that it will depend on how you’re implementing dark/light themes.
+
+For my apps I utilize CSS vars for my theme, so what I actually end up doing is creating one block for each of those queries and defining all of the theme color vars. **Then**, to let users override the system theme in app settings, I **also** define a second set of blocks which define the opposite theme colors when the `.override-dark` or `.override-light` class is applied to the `html` element. This makes theme overriding as simple as storing user config in `localStorage` (or a cookie to use server-side rendering) and setting an `.override-dark` or `.override-light` class on `html` if the user has indicated a preference.
+
+```css
+/**
+ * Default light theme (if you default dark, use a media query)
+ * here and remove the one on the dark theme in the next block
+ */
+html {
+  --color-paper: white;
+  --color-ink: black;
+  /** etc */
+}
+
+/** Default dark theme */
+@media (prefers-color-scheme: dark) {
+  html {
+    --color-paper: black;
+    --color-ink: white;
+  }
+}
+
+/** User override: prefers dark, but system is light */
+@media (prefers-color-scheme: light) {
+  html.override-dark {
+    --color-paper: black;
+    --color-ink: white;
+  }
+}
+
+/** User override: prefers light, but system is dark */
+@media (prefers-color-scheme: dark) {
+  html.override-light {
+    --color-paper: white;
+    --color-ink: black;
+  }
+}
+```
+
+You might be clever enough to make this more succinct, but I just created some processor functions to do this for me, which works fine for my ends.
+
+# Smart loading
+
+All apps need to load data. But native apps often are loading it from the local filesystem, not a server somewhere else. One of the subtle indications to a user that they’re using a browser is how things get loaded: blank white screens for page transitions, and a multitude of spinners in single-page apps. How can web apps compete in loading UX?
+
+## Start using local data
+
+This will heavily depend on your use case, but it _is_ possible to load your data from the local device in a web app. Even if the source of truth is on your server!
+
+There are two main ways to store local device data on the web - the Storage APIs, and IndexedDB.
+
+You may be familiar with the Storage APIs from using `localStorage` . There’s also its less permanent cousin, `sessionStorage`. People _do_ use these tools to store complex data (like using `JSON.stringify`), but they’re really meant as simple key-value stores. I think mostly folks use them for complicated data because IndexedDB is so intimidating to get started with. I get it, but eventually serializing and deserializing data out of `localStorage` is going to be too much overhead.
+
+I’d honestly recommend reading the docs for IndexedDB. If you’re comfortable with how callbacks work, I find it’s not so much effort to get the boilerplate out of the way and wrap it up in a custom API which conforms to your personal needs.
+
+That said, there are some great ways to wrap IndexedDB to make it easier to work with. Since I’m writing this article I’ll toss in [my local-first framework Verdant](https://verdant.dev), which can be used without the sync features as a standalone IndexedDB-powered database with a type-safe schema and deployable data migrations. For a lighter-weight approach, maybe check out [Dexie](https://dexie.org/).
+
+However, you don’t have to rely _only_ on local data to use these solutions. If your app data all lives in the cloud, you can still cache that data (or a relevant subset) locally on-device using web storage tools, so it’s ready instantly (and offline!) whenever the user opens the app. Many existing app state management systems, like Redux and Zustand, have plug-in systems to “persist” data for you easily. They’ll load data from disk to resume the last state, and then if network is available, they’ll repopulate it once the fetching is complete.
+
+### Side note: how about local-first?
+
+Something web developers take for granted is the idea that there's a server out there with a database, and that's where user data lives. But servers cost money to keep running, which incentivises you as an app provider to try to monetize your users with stuff like ads.
+
+And while there's definitely no shortage of ad-funded apps on mobile marketplaces, they can actually be more sustainable business-wise because they don't assume data needs to live on a server. For a simple app that's only managing a user's personal data, like a grocery list, why not _exclusively_ use IndexedDB?
+
+This is a growing area of focus in some web communities, and it's called local-first. [Verdant](https://verdant.dev) is a full local-first framework, including upgrading to multi-device sync and multiplayer with a server when you're ready. [I wrote a bit on it elsewhere](/blog/sustainable-software-should-be-simpler), and there's an [emerging community](https://localfirstweb.dev) around local-first more broadly. Check it out!
+
+## Delay transitions until data is loaded
+
+It’s not all about load times, though, in practice. It matters _how_ you load—how you represent the loading state to users. Try opening the Settings on your phone and tapping one of the options (maybe something with a decent amount of loading to do — like the list of all your installed apps). Notice what you _don’t_ see (at least on most recent phones). It’s a spinner.
+
+What I see, on Android, is the option I tapped plays a brief animation to indicate that it registered my intent. Then, for a few milliseconds, nothing happens… until the page I navigated to animates into view, fully loaded.
+
+This is a big thing web developers get wrong, thanks in part to a sort of spinner / “skeleton” obsession among common web learning material. Everyone loves making a fancy loading spinner, but the hard truth is, if done well, the user should almost never see it.
+
+The key is, instead of immediately updating the interface before the data to render it is ready, you instead want to establish this “native” feeling pattern for your interactions:
+
+- Immediately and clearly register user intent (with a visual state change)
+- Keep the current UI intact while you load in the background—including allowing interactions
+- Only transition when the next view is ready
+
+Now, that’s an ideal world case, but there are a few addendums for extraordinary circumstances:
+
+- If the delay in loading is more than a few seconds, show _another_ affordance to assure the user you’re working on their action
+- If the action the user took implies an immediate change of location, go ahead and transition and show a spinner (I’ll cover those cases in a bit)
+
+### Registering intent
+
+I think in part this kind of loading flow isn’t taught because it relies on some design sense, not just technical ability. You have to step back and understand what the user is trying to do, not just what the software is capable of.
+
+Which also means I can’t give you a code sample and banket advice here. What you have to do is think about what this action means to your user. Things like, “I selected a settings menu option, so I want to see that sub-menu,” or, “I entered a new search term, I expect to see different results.” The end-goal of that action (the sub-menu, the new results) is something you can’t do yet (hence the loading). So what can you do in the meantime, besides showing a new blank page with a spinner, to assure the user that they did successfully execute their action? Maybe change the background color of the button, or animate the border of the search bar. It’s fun to get creative with this, and these are the details that really count toward making your app feel high-quality.
+
+### Parallel loading
+
+In the meantime, while you’re showing the initial affordance, you want to immediately begin loading the next step. For a well-architected web app, this often means loading a code-split bundle of code which powers the next page. There’s probably also some data you want to load, either from an API or IndexedDB. All of these things are async, they take time, but they don’t block the main thread.
+
+The real trick here is how to capture that loaded data and use it for the next step of the process. Different tools have different ways to do this, and some are ambivalent about how you accomplish it.
+
+**How to do it in React (with Suspense)**
+
+Since I have a lot of React experience, I’ll note here that this is what React’s _Suspense_ and _Concurrent Mode_ features are designed to tackle. Rather than being responsible for capturing and caching the newly loaded data and getting it to the next view, React lets you directly request that data within the components that power that view like you normally would, but it won’t actually _show_ the new UI until that loading is complete. With Suspense, React will either show a _fallback_ (passed as a prop to your Suspense boundary) or, if you’re using `useTransition`, it will actually keep rendering your old UI until the Suspense loading is resolved.
+
+That means, once you understand Suspense and `useTransition`, you can get this parallel loading basically for free—keep writing your app like normal, and sprinkle in these two features as needed to keep transitions smooth. One of the reasons I’m still rooting for React after so many years is that they’ve clearly taken these kinds of details into account as the library has evolved.
+
+**How to do it anywhere**
+
+React isn’t, and shouldn’t be, the whole web. It’s best to learn these principles from fundamentals, so stepping away from React’s particular approach—what are we trying to accomplish?
+
+It’s simple enough to fire off a `fetch` when your user clicks a link (and prevent default navigation), wait for that fetch to resolve, and then update the URL. The part that’s a little more ambiguous is how you get your data from that event handler into your new UI state once you’ve transitioned.
+
+This is where it’s helpful to have some centralized app state. For example, if you’re using a Zustand store as your main app state, instead of simply `fetch`ing in your `click` handler, you can integrate that data retrieval into your central store, and cache the resulting data so that it’s ready to use in the upcoming view. This also works out-of-the-box in a higher-level API client like Apollo for GraphQL.
+
+```jsx
+// in pseudo-code...
+
+// a rough sketch of a very simple client
+class Client {
+  cache = new Map();
+
+  load = async (key) => {
+    const data = await query(key);
+    this.cache.set(key, data);
+  };
+
+  get = (key) => Map.get(key) ?? null;
+}
+const client = new Client();
+
+// this handler is attached to an <a> which loads the new page
+async function onLinkClick(ev) {
+  // prevent immediate navigation
+  ev.preventDefault();
+  // begin the initial affordance to show the user their action is registered.
+  // in this case, let's assume that's done with a CSS animation on the link itself,
+  // controlled by a class.
+  ev.target.classList.add('link-loading');
+  // preload necessary data. this assumes the client will cache this data once loaded.
+  await client.load(
+    '... whatever query / fetch you need for the next page ...',
+  );
+  // resume navigation
+  history.pushState({}, '', ev.target.href);
+}
+
+// this code renders the new page
+async function renderOtherPage() {
+  // suppose our client allows a simple get on the data from the cache. if the
+  // data isn't preloaded, this returns null
+  let data = client.get(
+    '... whatever query / fetch you need for the next page ...',
+  );
+  if (!data) {
+    data = await client.load(
+      '... whatever query / fetch you need for the next page ...',
+    );
+  }
+  renderTheUI(data);
+}
+```
+
+What you’re really trying to make sure happens here, is that when you move the user to the next UI state, it doesn’t trigger a re-loading of the data. To write your UI in such a way that it can effectively render whether the data is already cached, or if it still has to be fetched from storage or network.
+
+## Additional affordances
+
+Sometimes, loading can take a while. In that case, we want to reassure the user that the app is still functioning and processing their action. One way to do this is to queue up another affordance after a set time elapses and our preload hasn’t yet finished.
+
+In React, this can be done by observing the boolean returned from `useTransition` which indicates a transition is in progress, and a debounced effect to update additional state.
+
+```jsx
+const [isPending, startTransition] = useTransition();
+const [isLongTransition, setIsLongTransition] = useState(false);
+
+// this is not ideal use of state but should illustrate the concept.
+useEffect(() => {
+  if (isPending) {
+    const timeout = setTimeout(() => {
+      setIsLongTransition(true);
+    }, 2000);
+    return () => clearTimeout(timeout);
+  } else {
+    setIsLongTransition(false);
+  }
+}, [isPending]);
+```
+
+Or, with any or no framework, you can likewise utilize `setTimeout` to update state after an elapsed period. Just make sure to cancel the timeout once the loading resolves.
+
+```jsx
+async function onLinkClick(ev) {
+  ev.preventDefault();
+
+  ev.target.classList.add('link-loading');
+
+  // set a timer for a secondary affordance
+  const timeout = setTimeout(() => {
+    body.classList.add('long-loading');
+  }, 2000);
+
+  await client.load(
+    '... whatever query / fetch you need for the next page ...',
+  );
+
+  // clear timeout. if timer already fired, also remove secondary affordance.
+  clearTimeout(timeout);
+  body.classList.remove('long-loading');
+
+  history.pushState({}, '', ev.target.href);
+}
+```
+
+## Exceptions to pre-loading
+
+Some actions should trigger an immediate transition, even if that means showing a spinner. For example, clicking “Create Note” in a notes app should probably not sit loading on the current page until the new note is ready to edit, as this may result in user confusion depending on the order of loading. For example, in the video below, the new recipe is created and added to the list before the page transition is ready.
+
+<Video src="/images/blog/pwa-native/create-recipe.mp4" />
+<Caption>
+  A purposefully broken create recipe flow demonstrated in my app,{' '}
+  <a target="_blank" href="https://gnocchi.club">
+    Gnocchi.
+  </a>
+</Caption>
+
+If the loading were to take a second or two longer, the user might be confused and click the card manually. While it’s not the end of the world, this order of events drives user confusion and a sense that the app is not well-designed.
+
+Instead, we omit all of the fancy stuff above in cases like this, and go ahead and navigate to the next page immediately. Loading states on that page will take care of providing proper UX while the data needed to render the UI is being loaded.
+
+You may discover other cases where an immediate transition is needed, like when first typing into a search bar. It’ll depend on how your app functions, how you structure your views, and other factors which only you know!
+
+# Styling elements for interaction
+
+The web ships with some fairly good interactive element user-agent styles, but anyone who’s done even a little web development knows the first thing most people do is clear all that away. Each product has its own unique style. Unfortunately, that means re-inventing all those various interaction states for all your elements in your design system. I’ve observed that often, somewhere between design teams and engineers, some of these states get overlooked or misunderstood.
+
+The goal of this article isn’t really to educate on those states (the important ones are [here](https://developer.mozilla.org/en-US/docs/Web/CSS/Pseudo-classes#user_action_pseudo-classes), but read the whole list, you’d be surprised what you can do!). But there are some styling considerations which may not be immediately obvious which you should consider if your goal is making your web app feel native.
+
+## `:active` or no?
+
+`:active` is the button’s “pressed” state, and using it is can make buttons feel responsive to user input. But it’s worth saying here: open up some native apps on your phone and tap some buttons. Very few of them seem to have a pressed state (at least on mine). That seems counter-intuitive! Native apps usually feel snappy and responsive, so what’s up with not using a state that directly responds to user input?
+
+My theory on this is: more visual transitions = more user perception of effort. Native apps feel snappy in large part because they don’t have time to show you an intermediate pressed state on a button. The very millisecond your finger leaves contact with the screen, the UI is already moving. If possible, mimic that snappiness! You may not need a pressed state at all.
+
+However, as noted in the last section, sometimes loading is inevitable. That’s where the initial affordance for loading comes in. This is often attached to the interactive element (link or button) which triggered the loading. Still, if the loading is fast enough, the user may never see that affordance, and that’s a good thing. You may even want to add a `transition-delay` of a few milliseconds just to see if you can avoid showing it!
+
+Nevertheless, you may want to add a pressed state to your buttons, anyway. Maybe you just like the way it feels. With a warning aside that this may make your app feel _less_ native, my recommendation is to choose something subtle but recognizable—maybe some small motion, like Google’s Material “ink drop” effect, or a little scale-down as if the button is being pushed backward. Just don’t overdo it!
+
+## Prefer `:focus-visible` to `:focus`, but DO use it
+
+Perhaps one of the most common lines of CSS is `button:focus { outline: none; }`. I mean, let’s face it, the built-in browser focus outlines are ugly. They don’t even follow border radius!
+
+But you can’t stop there, because accessibility matters. If you’ve ever tried applying your own focus styles, though (maybe using `box-shadow` to get that nice border radius curve), you’ll quickly notice that buttons get “stuck” after you press them. Because they remain focused after press!
+
+<Video src="/images/blog/pwa-native/sticky-buttons.mp4" />
+
+That’s why `:focus-visible` exists. It’s only applied when focus is controlled more intentionally, like via keyboard. So put your focus styles in there, and your buttons will feel more springy.
+
+## `user-select: none`
+
+When was the last time you accidentally highlighted the text of a button in a native app? Never? That’s because native UIs don’t even allow that (at least, by default). In fact, more often than not, you can’t select text in native apps… even stuff you really _should_ be able to.
+
+If you’re feeling gutsy, do a `* { user-select: none }`, then re-enable it for blocks of text you want to let users highlight and copy. If that seems a little too extreme, you can at least safely do it on `button`. Avoid the nasty, fourth-wall-breaking effect of accidentally starting text selection when you were just trying to activate a button!
+
+## Overscroll behavior
+
+This is a sneaky one that a lot of mobile web app makers miss. When you scroll to the end of a webpage on Android, the page stretches and bounces a bit. What this usually means, if you have stuff like an absolute-positioned navigation, is that empty white space becomes visible at the edges of your app. Really breaks the immersion!
+
+Plus, if you scroll up at the top of the page, you’ll get a pull-down-to-refresh experience. Native apps don’t have that (well, if they do, it’s one that they control—not on every single page).
+
+However, you want to be mindful of user expectations here. When viewing your app as a webpage in the browser, users should still be able to use these tools. We just want to remove them in the PWA, to get a more native feel.
+
+This is one thing I can just toss you some code for:
+
+```css
+@media (display-mode: standalone) {
+  html,
+  body {
+    overscroll-behavior: none;
+  }
+}
+```
+
+Turning off overscroll behavior removes both rubberbanding and pull-to-refresh. Now the edges of your scrolled pages will feel nice and solid.
+
+However, if you do want a pull to refresh (like on a home feed), you’re gonna have to figure that out yourself. But anyway, you probably didn’t want the blank-page full-refresh behavior, anyway.
+
+## Sheets
+
+If you aren’t familiar, a “sheet” is a term for a dialog that’s anchored to one edge of the screen. On mobile, you see a lot of sheets which are bottom-anchored.
+
+Sheets are simply easier to use with one hand on a phone, since they position controls near the bottom of the screen instead of the center. It’s a little trickier to pull off than just `bottom: 0px` though.
+
+One big sticking point is the mobile keyboard. If your dialog/sheet features text input, you don’t want the keyboard to overlap the sheet when it pops open. On Android, the touch keyboard doesn’t resize the window, it overlaps the page content. That means you need to position your sheet’s bottom edge to match the height of the keyboard.
+
+The visual viewport height can also change when the user scrolls, if their mobile browser hides its URL bar and other chrome after scrolling.
+
+Not only that, but on iOS, the viewport area extends down _underneath_ the main navigation gesture bar, which can overlap your content. Why can’t anything be simple?
+
+This is a problem I’m still figuring out myself. If you’ve got simple solutions, I’d love to hear them. But here’s what I’ve come up with:
+
+### Establish and update CSS vars for the viewport “safe area”
+
+When the virtual keyboard appears or disappears, it will trigger a `resize` event on `window.visualViewport` (did you know that was a thing?).
+
+So what I start off with is listening to that event and the window’s `scroll` event, and triggering a callback to apply some CSS vars to the document which I can use elsewhere in CSS calculations.
+
+```jsx
+const update = () => {
+  document.documentElement.style.setProperty(
+    '--viewport-bottom-offset',
+    `${window.innerHeight - viewport.height}px`,
+  );
+  document.documentElement.style.setProperty(
+    '--viewport-height',
+    `${viewport.height}px`,
+  );
+};
+
+update();
+
+window.addEventListener('scroll', update, { passive: true });
+// not all browsers support this.
+if (window.visualViewport) {
+  viewport.addEventListener('resize', update);
+}
+```
+
+Now, I can use the `--viewport-bottom-offset` var to set the bottom value for a sheet. I add a fallback of `0px` just in case.
+
+```css
+bottom: var(--viewport-bottom-offset, 0px);
+```
+
+### Utilize `safe-area-inset` environment vars
+
+On supported devices, there’s also the built-in `safe-area-inset` collection of CSS vars which can help you avoid things like the global navigation gesture bar and camera cutouts.
+
+You don’t want to use these to offset the sheet position—otherwise the sheet would ‘hover’ above the navigation bar. Instead, I use it to pad the bottom of the sheet to ensure that content doesn’t get overlapped.
+
+```css
+padding-bottom: calc(3rem + env(safe-area-inset-bottom, 0px));
+```
+
+These techniques combined can _help_ to position sheets correctly, but I’m afraid there’s still some instability possible when doing text input with the virtual keyboard, especially if you trigger focus on the text input immediately when showing the dialog. Hopefully I can find some more stable solutions.
+
+### Swipe to dismiss
+
+Another native feature of sheets which you can copy is the swipe-to-dismiss gesture. This lets the user swipe downward on the sheet to close it (after a certain threshold).
+
+<Video src="/images/blog/pwa-native/sheet-gestures.mp4" />
+<Caption>The GitHub app has great sheet gestures.</Caption>
+
+Some important details about this gesture:
+
+1. There’s usually a visual affordance in the form of a small horizontal bar at the top of the sheet.
+2. Despite that affordance, the user can begin the gesture _anywhere_ on the sheet.
+3. If the sheet has scrolling content, the gesture only triggers when that content is scrolled to the top. Otherwise, swiping downward scrolls up, like normal.
+4. The gesture can be cancelled by either ending before the threshold, or swiping back upward.
+5. Some fancier sheets even let you drag upward to expand the sheet to be larger and show more content.
+
+It’s ambitious to copy all these behaviors, but you could start by adding swipe-to-dismiss starting just from the top edge of the sheet and work from there. Most users probably see the visual affordance and anchor their swipe there, anyways, so you can avoid worrying about scrolling content for an MVP implementation.
+
+## Bottom tab navigation
+
+Lots of native apps have settled on a bottom-tab navigation structure. It’s convenient and easy to reach! But just like sheets, there’s a little more to doing this right than meets the eye.
+
+Well, ok, it’s the same problem. You need to make sure the system gesture bar doesn’t overlap your nav. Time to break out `env(safe-area-inset-bottom)` again! Just pad the bottom of your nav with that value plus a bit extra to make sure users can utilize your nav bar.
+
+That said, there’s one more important rule: don’t put more than 5 items in there (and I think 4 is a better maximum). This is an information architecture problem, and big name apps have teams of designers who have done tons of work on it for their particular use cases. You’ll have to do your best, too: figure out a maximum of 5 categories that encompass the core experiences in your app. All your pages should be structured under these categories.
+
+That’s not to say you can’t cheat a little bit. For example, Spotify doesn’t put user settings in their nav bar, they make it accessible only on the “Home” screen in the top right corner. It’s a good trick for less-frequently-used pages.
+
+But seriously, if mature and multi-featured apps like Spotify and Slack can figure out how to present 5 or fewer top-level navigation options, so can you!
+
+## A special note on `select`
+
+Select is a disaster. It’s practically unstylable. But it has one key benefit: natively, it adapts well to phone input. Instead of trying to place a little pop-over somewhere on the already cramped mobile screen, HTML’s Select just drops a full modal over the whole UI for simple, finger-friendly selection.
+
+There are still problems with this, though. You can only represent a simple list of text options. Anything fancier—colors, user avatars, badges, whatever—and you’re out of luck.
+
+Take note of how native apps manage selects like this. For one, they’re not very common. Yet another reason to avoid them! But when you need one, good UX is a little more nuanced than you think.
+
+### For just a few options: try a pop-over
+
+![A screenshot of a small popover for selecting one of three statuses in the GitHub app](/images/blog/pwa-native/github-small-dropdown.png)
+
+<Caption>
+  The GitHub app uses a simple dropdown for the three-option status selector
+</Caption>
+
+Selects should never have fewer than 3 options (if you’ve only got 2, use a different element!). But if you’ve got 3 or 4, and they’re relatively compact labels, a pop-over is fine and gives quick, localized access.
+
+### For more: use a sheet
+
+![A screenshot of a sheet with a filtered list of labels in the GitHub app](/images/blog/pwa-native/github-large-dropdown.png)
+
+<Caption>
+  The GitHub app opens a sheet for the long list of labels in the label selector
+</Caption>
+
+What’s better than the browser’s native select modal dialog? A sheet positioned at the _bottom_ of the screen for easy reach. In a sheet, you can list as many options as you like, plus include fancy controls for filtering. Think of this as a UX opportunity, not extra work!
+
+Of course, how you approach this in code will be the challenge. Supporting two entirely different interactions on mobile and desktop can be a burden. I’d say it depends on your primary target platform. If you’re mobile-focused, there’s no reason you can’t get by with a sheet interface on desktop, too (maybe give it a maximum width, or even alter its positioning so it shows up as a centered, typical dialog).
+
+# Using platform features
+
+You’re a web app, not a website. Why not use some of the available features on your user’s device? While many features are need-based (like location, or the camera), there are some goodies you can sprinkle in to make your experience feel less like a page inside a browser, and more like software running right on the device.
+
+## Rumble!
+
+Don’t overdo this! It bears repeating—don’t overdo it! But using haptic feedback can be a very situational but powerful tool for UX. I particularly like to use it when an action triggers something which may happen out of view. For example, in my groceries app, I give your phone a little shake when you add items to your list from a different page, just to confirm that those items really did get added even though you can’t see your list.
+
+## Share targets
+
+Did you know you can get your PWA into the system share dialog? I think it’s one of the coolest things PWAs can do! When you register as a share target, users can “Share to” your app, and you get either a POST payload or a set of query parameters (your choice) that include a link or some text they shared.
+
+You don’t need a server to handle a share. Even with the POST version, you can write a handler in your service worker to respond to it on-device for static-only sites.
+
+```jsx
+// in your service worker...
+
+self.addEventListener('fetch', (event) => {
+  const url = new URL(event.request.url);
+
+  // detect a share event from the PWA
+  if (event.request.method === 'POST' && url.pathname === '/share') {
+    // redirect so the user can refresh without resending data
+    event.respondWith(Response.redirect('/'));
+    // handle the share!
+  }
+});
+```
+
+[Check out more on how to use share targets here.](https://web.dev/web-share/)
+
+# The extra mile(s)
+
+I think those things cover the table stakes of creating a good mobile app experience on the web. Now let’s get into the things that will make users forget it’s a website. We're going beyond just making it feel native, we're making it feel like a genuinely good app.
+
+Fair warning: these are even more work!
+
+## Follow the OS’ design principles
+
+iOS and Android have different design sensibilities which differ from browser user-agent styling _and_ from each other. Since native apps are often building on the same tools as first-party apps, they often have an easier time looking and feeling like their host OS. The culture around native apps is also different (and, seemingly, different between iOS and Android); there’s more expectation to fit in with the native design system.
+
+On the web, we’re a little unmoored from any native design. There’s no telling what the browser which views your page looks like, and on top of that, the host OS is also variable. Trying to conform website styles to their surroundings is a losing battle, but you _can_ make some tweaks to fit in better on iOS and Android specifically if your focus is mobile. Two customization targets are a little easier to manage than a hundred permutations (although still very… extra).
+
+And, in fact, mobile design is sort of converging a bit at a high level on flat color shapes and simplified elements, so even just adapting your own designs to those common details can help you fit in.
+
+For example, most mobile system UI buttons (right now) have large border radii, often extending across the entire horizontal edges (i.e. `border-radius: 100%`). They’re also solid-colored. That’s a pretty easy update to make in your CSS to feel more at home.
+
+Don’t want to change your desktop styles, too? As far as I know, this is an imprecise science. You could try using a small media query size, like `(max-width: 720px)`. But desktop windows can get that small, too. Whether you care is up to you.
+
+For a more robust option, you might try using Javascript to check the user-agent for mobile tags, then apply a class on your `body` which other elements can use to select their own rules, like `body.ios button { ... }`. Keep in mind that this may result in a flash of different styling, though, unless you’re doing server-side rendering and can pre-populate that class in the initial HTML payload by inspecting headers. This all sounds more trouble than it’s worth to me, though, just riffing.
+
+## Disable context menus
+
+This is similar to `user-select: none`, but a little more… contextual. Especially for links, even if `user-select: none` is applied, the user can still long-press and get the boring old browser context menu, which offers to copy the link address, open in the browser, etc.
+
+I think _sometimes_ you want to let users do this, especially for inline text links. But for situations like app navigation, probably not! Disable the context menu on those by calling `preventDefault` on the `contextmenu` event.
+
+## Swipe-based navigation
+
+This is one of those really hard things that lucky native mobile developers get more or less for free. Ever noticed how in apps with bottom-bar tab navigation, you can often swipe to the left or right to change pages?
+
+Yeah, stop and think about how you’d do that with your web app! Keep in mind it’s not just a binary gesture; you can move your finger around and the whole view moves with it. Move it back to cancel the gesture entirely.
+
+<Video src="/images/blog/pwa-native/gpay-nav-gesture.mp4" />
+<Caption>
+  GPay is one of those rare apps that has swipe-based navigation, and it feels
+  great.
+</Caption>
+
+If you really want to show off, try doing this in your app. I did it with [Gnocchi](https://gnocchi.club), and it was challenging but fun to pull off. I had to create my own client-side routing library! My approach was to create a component which could render the UI for any particular URL, even if that URL doesn’t match the browser’s current location. Then, when the user’s gesture triggers a threshold of movement, I render the page to the left or right of the current one, using CSS `transform` to control the displacement according to finger position.
+
+<Video src="/images/blog/pwa-native/gnocchi-nav-gestures.mp4" />
+<Caption>
+  My app,{' '}
+  <a href="https://gnocchi.club" target="_blank">
+    Gnocchi
+  </a>
+  , uses swipe-based navigation. It was a pain but it's fun to play with!
+</Caption>
+
+I’m sure there are other ways to approach this without writing your own router. Perhaps you can encapsulate individual pages in their own reusable components more effectively than I did, and just render those components. But using paths seemed relatively simple to me at the time. Your mileage may vary!
+
+Nonetheless, this is a small but difficult thing which adds a ton to the overall user experience feeling ‘native.’ Users take this gesture for granted in apps they use every day. If you want them to really forget it’s a web app, try replicating it!
+
+One caveat, this won't be a good gesture if your app already has horizontal gestures for actions like archiving list items.
+
+# Conclusion
+
+Wow, that’s a lot of work just to feel native, right? Are web apps a bad idea?
+
+In my opinion: not at all! For one, a lot of these things are going to benefit your app when running on non-mobile platforms, too. And, at the end of the day, _your app can run on other platforms!_ It may take some effort and intentionality, even a bit of hard work, but I think it’s possible to live the dream of one cross-platform codebase without trading off a good, close-to-native experience. It’s why I love being a web developer.
+
+Here’s to better web apps!
