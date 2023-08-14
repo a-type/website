@@ -451,9 +451,9 @@ That’s why `:focus-visible` exists. It’s only applied when focus is controll
 
 ## `user-select: none`
 
-When was the last time you accidentally highlighted the text of a button in a native app? Never? That’s because native UIs don’t even allow that (at least, by default). In fact, more often than not, you can’t select text in native apps… even stuff you really _should_ be able to.
+When was the last time you accidentally highlighted an image in a native app? Never? That’s because native UIs don’t even allow that (at least, by default). In fact, more often than not, you can’t select most text in native apps… even stuff you really _should_ be able to.
 
-If you’re feeling gutsy, do a `* { user-select: none }`, then re-enable it for blocks of text you want to let users highlight and copy. If that seems a little too extreme, you can at least safely do it on `button`. Avoid the nasty, fourth-wall-breaking effect of accidentally starting text selection when you were just trying to activate a button!
+If you’re feeling gutsy, do a `* { user-select: none }`, then re-enable it for blocks of text you want to let users highlight and copy. If that seems a little too extreme, you can at least safely do it on `img` and other elements you definitely don't want selected. Avoid the nasty, fourth-wall-breaking effect of accidentally starting text selection when you were just trying to scroll!
 
 ## Overscroll behavior
 
