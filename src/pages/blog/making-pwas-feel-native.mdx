@@ -359,7 +359,7 @@ What you’re really trying to make sure happens here, is that when you move the
 
 ## Additional affordances
 
-Sometimes, loading can take a while. In that case, we want to reassure the user that the app is still functioning and processing their action. One way to do this is to queue up another affordance after a set time elapses and our preload hasn’t yet finished.
+Sometimes, loading can take a while. In that case, we want to reassure the user that the app is still functioning and processing their action. One way to do this is to queue up another affordance after a set time elapses and our preload hasn’t yet finished. You'll often see this in the form of a progress bar that spans the top of the page.
 
 In React, this can be done by observing the boolean returned from `useTransition` which indicates a transition is in progress, and a debounced effect to update additional state.
 
