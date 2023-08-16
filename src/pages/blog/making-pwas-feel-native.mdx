@@ -18,6 +18,9 @@ But first, for the native elitists… yeah, I know a single-threaded browser vie
 
 Also, this isn’t the kind of post where I’m going to give you a bunch of code to copy and try. Most of this stuff is highly dependent on how your app works. What I’m going over here are _principles_, the implementation is up to you.
 
+> [![The title card for Gnocchi.club, my groceries app. It shows a pan with various ingredients in it, and a screenshot of the grocery list page in the app.](https://gnocchi.club/og-image.png)](https://gnocchi.club)
+> Almost every technique I cover here, I've put into practice in my latest app, [Gnocchi](https://gnocchi.club), which I've been building over the past year both as a useful grocery list and recipe manager, but also an experiment to see how far I could push web app UX. And I'm pretty happy with the results! See for yourself.
+
 # It starts with a PWA
 
 This almost goes without saying, but you need a PWA (Portable Web App) to get things started. That means you need two things: a service worker, and a manifest.
@@ -35,6 +38,55 @@ Luckily, there are plenty of great tools like Workbox which help us deal with se
 The important thing to know at a high level is that we need to gather up a list of every URL that our app needs to request (whether it be an HTML, JS, CSS, or asset file) that we want to be available offline, and register those in our service worker.
 
 When those change, which always happens when you change your app code or swap out an image, we re-generate that list. This changes the actual code of our service worker, because it’s using that list (often just an inline array of strings) within its own code. The browser notices the service worker code is different, and from there we can pre-fetch those new assets, cache them, and prepare to update the app.
+
+## Customize your installation flow
+
+This really mostly applies to Android, as Apple is extremely reticent about prompting users to install PWAs (in line with their general attitude toward web-based apps, in favor of the App Store). But Google is more of an ally in this endeavor, and Chrome is pretty eager to prompt users to install your PWA once it detects user engagement. The default experience is alright, but it only pops up once. Customizing your installation can help you get more users to install your app by keeping the option available in right in your UI.
+
+![a screenshot of my groceries app with two examples of install buttons in the UI](/images/blog/pwa-native/install.png)
+
+<Caption>
+  Two examples of PWA install buttons displayed within the app's UI.
+</Caption>
+
+To do this well, you need to listen for the `beforeinstallprompt` event on the `window` object. This event is fired when the browser detects that the user has engaged with your app enough to warrant an install prompt. The trick here is you can call `preventDefault` to disable the built-in prompt experience, and then _save a reference to the event_ to manually trigger it later.
+
+```jsx
+let deferredPrompt;
+
+window.addEventListener('beforeinstallprompt', (ev) => {
+  ev.preventDefault();
+  deferredPrompt = ev;
+});
+```
+
+Now you can wire up some other button in your app to trigger the install prompt.
+
+```jsx
+function showInstallPrompt() {
+  if (deferredPrompt) {
+    deferredPrompt.prompt();
+    // you can optionally see if the user decided to install or not.
+    // useful to know if your PWA is getting adoption.
+    deferredPrompt.userChoice.then((choiceResult) => {
+      if (choiceResult.outcome === 'accepted') {
+        console.log('User accepted the install prompt');
+      } else {
+        console.log('User dismissed the install prompt');
+      }
+      deferredPrompt = null;
+    });
+  }
+}
+```
+
+How you surface this action is up to you, but keep in mind that you need to avoid showing it if you haven't gotten a `beforeinstallprompt` event yet. That means using some dynamic state management in your framework of choice to keep track of whether you have a deferred event to utilize for the prompt.
+
+### Tips for custom install flows
+
+I like having a dedicated and persistent "Install App" call to action somewhere in the app, whether it's just on the settings page or in the main navigation, if there's room. In Gnocchi I also have a periodic, dismissable prompt which shows up in the empty state of the grocery list, where there's a lot of unused whitespace already. You don't want to pester the user, but you do want to surface the option.
+
+One thing to note here is that only you, as the developer, care that this is a PWA. Users don't know what that means and don't care. So, in my opinion, don't try to differentiate that this is a "Web App" or use terminology like "Add this website to your home screen." Just say "Install the app." At least on Chrome (which is the only place this install method will reliably show up), the experience is already so nice for installation that you don't need to explain it. Also, as of writing, Android doesn't actually add an icon to the user's home screen unless they have their launcher configured to do that for every app, so 'add to homescreen' is outdated terminology anyway. Your PWA will show up in the app drawer like everything else.
 
 ## App updates
 
