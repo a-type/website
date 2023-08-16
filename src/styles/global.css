@@ -30,6 +30,12 @@
   font-display: swap;
 }
 
+:root {
+  --color-primary: #3f7058;
+  --color-primary-wash: #e6f2ec;
+  --color-primary-light: #5a9679;
+}
+
 body {
   font-family: Inter, Arial, Helvetica, sans-serif;
   margin: auto;
@@ -55,10 +61,7 @@ b {
   color: #222;
 }
 a {
-  color: #3f7058;
-}
-nav a {
-  margin-right: 10px;
+  color: var(--color-primary);
 }
 textarea {
   width: 100%;

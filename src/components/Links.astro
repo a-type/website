@@ -8,17 +8,23 @@ import HeaderLink from './HeaderLink.astro';
     bottom: 0px;
     background: white;
     padding: 1rem 0;
+    margin-top: 30px;
+    box-shadow: 0 -20px 32px 10px rgba(255, 255, 255);
+    display: flex;
+    flex-direction: row;
+    gap: 0.5em;
+    flex-wrap: wrap;
   }
 </style>
 <nav>
   <HeaderLink href="/blog">Blog</HeaderLink>
   <HeaderLink href="https://twitter.com/gaforres" target="_blank"
-    >Twitter (dormant)</HeaderLink
+    >Twitter</HeaderLink
   >
   <HeaderLink href="https://indieweb.social/@grantf" target="_blank"
-    >Mastodon</HeaderLink>
+    >Mastodon</HeaderLink
+  >
   <HeaderLink href="https://github.com/a-type" target="_blank"
     >GitHub</HeaderLink
   >
-  <HeaderLink href="/resume.pdf">Resume</HeaderLink>
 </nav>
