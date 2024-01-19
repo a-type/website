@@ -6,17 +6,15 @@ pubDate: 'Jan 18 2024'
 
 It shouldn't be hard to build projects with Typescript in 2024 CE, but here we are.
 
-**I should warn you now - the technique I will outline is a slight hack. But it does work.**
-
 I've spent years trying to find the holy grail of Typescript monorepos:
 
 - Node servers and Vite web apps both work
 - At dev time, all projects use Typescript source (NO watch mode transpiling)
 - In prod, all projects use transpiled Javascript (NO `tsx` on production server)
 - Isomorphic monorepo dependencies used by both server and web
-- No dirty tricks\*
+- No dirty tricks
 
-<sup>\* didn't _quite_ accomplish this, but close.</sup>
+It turns out there's a semi-official, community convention for doing this already! It's supported by Node, Vite, Webpack, and most other tools.
 
 ## What I was doing
 
@@ -62,19 +60,21 @@ Yes, even if I build those libraries to JS, this still happens! In fact, I do th
 
 ## Or can you?
 
-No, you still can't (they do the same resolution!) But what you _can_ do is tell Node to resolve things differently, using a CLI flag you may have ignored as useless to you:
+No, you still can't (they do the same resolution!) But what you _can_ do is tell Node and Vite (or whatever tool you're using for web builds) to resolve things differently, using a configuration option you may have ignored as useless to you: custom conditions. We don't need tricks, we can use the tools as designed.
 
-```
-node --conditions=prod ./build/server.js
-```
+Custom conditions tells module resolution to accept your custom `export` conditions. We're going to use this to make Typescript and Node resolve modules differently, so that our projects resolve `.ts` files during dev time (when running via `tsx`) and `.js` files in production.
 
-The `--conditions` flag tells Node to accept your custom `export` conditions. We're going to use this to make Typescript and Node resolve modules differently, so that our server resolves `.ts` files during dev time (when running via `tsx`) and `.js` files in production (when running via `node --conditions prod`).
+All that, and we won't need to hijack `import` anymore, either!
 
 ## Setting it up
 
-I use a condition named `prod`, but you can name it whatever you like. I'd avoid naming it something that sounds official so no one gets confused.
+I use conditions named `production` and `development`. [`production`/`development` is a community convention for sources only used in each environment.](https://nodejs.org/api/packages.html#community-conditions-definitions)
 
-Add your new `exports` condition to your monorepo libraries. **It needs to come first**. Export condition order matters; both Node and Typescript will try conditions in order. The behavior we want is that Node will try your custom condition first and use it, but Typescript won't recognize it and move on to the next one (`import`).
+> **WARNING!** I am a full-blown ESM user. I don't really touch CJS anymore if I can help it. So most of this config is going to be ESM-oriented. You may need to make adjustments, like using `require` instead of `import` for fallback conditions. It's complicated...
+
+### Update your monorepo dependencies
+
+Add your new `exports` condition to your monorepo libraries for your Node server.
 
 Your `package.json` `exports` will look like this:
 
@@ -82,8 +82,8 @@ Your `package.json` `exports` will look like this:
 {
   "exports": {
     ".": {
-      "prod": "./dist/index.js",
-      "import": "./src/index.ts",
+      "production": "./dist/index.js",
+      "development": "./src/index.ts",
       "default": "./dist/index.js"
     }
   }
@@ -92,11 +92,94 @@ Your `package.json` `exports` will look like this:
 
 You may need to adjust those file paths to match your actual project structure. For example, if your entry file is JSX, you'd want `import` to be `./src/index.tsx`. Or if your Typescript `tsconfig.json` has an `outDir` besides `dist`, replace it with yours. Or maybe you want to add some more export entrypoints.
 
-Make no changes to dev mode tools; they should ignore `prod` and continue using `import`, which points to Typescript sources.
+### Update your `tsconfig.json`
 
-For your server, update your `node` CLI usage to include `--conditions=prod`.
+We need to help Typescript resolve the `development` condition when it's doing typechecking. Since I use [Typescript config inheritance](https://www.typescriptlang.org/tsconfig#extends) I just updated my root config:
+
+```json
+{
+  "compilerOptions": {
+    //...
+    "customConditions": ["development"]
+  }
+}
+```
+
+### For the Node server
+
+In development mode, pass `--conditions=development` to whatever is running Node. For example, I use `tsx` to watch and recompile my Typescript server, and it passes flags on to Node under the hood, so I do this:
+
+```json
+{
+  "scripts": {
+    "dev": "tsx watch --conditions=development ./src/server.ts"
+  }
+}
+```
+
+For your production server, transpile all your sources and monorepo dependencies, then run Node against your JS files with the `conditions` flag, too:
+
+```json
+{
+  "scripts": {
+    "start": "node --conditions=production ./build/server.js"
+  }
+}
+```
 
 Make sure to build all packages before running your server in production mode, since it will be working with JS sources across all libraries.
+
+### For Vite
+
+You can supply conditions to Vite using the `resolve.conditions` configuration. We can supply different conditions for `development` and `production` mode, just like we do with Node.
+
+```js
+export default defineConfig(({ mode }) => ({
+  // ...
+  resolve: {
+    conditions:
+      mode === 'production'
+        ? ['production', 'import', 'module', 'browser', 'default']
+        : ['development', 'import', 'module', 'browser', 'default'],
+  },
+}));
+```
+
+Here I've prepended my custom condition for each mode onto the default list of conditions which Vite uses for module resolution.
+
+When running Vite, I set an explicit mode just to be sure:
+
+```json
+{
+	"scripts": {
+		"dev": "vite --host --mode development",
+		"build": "vite build --mode production",
+```
+
+### For NextJS (with Webpack config, at least)
+
+I'm not on the cutting edge of NextJS, honestly their config kinda confuses me. But I know this at least works: I specify the conditions as part of the Webpack config.
+
+```ts
+const nextConfig = {
+  //...
+	webpack: (config, { dev, buildId }) => {
+		config.resolve.extensionAlias = {
+			'.js': ['.ts', '.tsx', '.js', '.jsx'],
+			'.jsx': ['.ts', '.tsx', '.js', '.jsx'],
+		};
+		config.resolve.conditionNames = dev
+			? ['development', 'import', 'module', 'default']
+			: ['production', 'import', 'module', 'default'];
+```
+
+I'm not sure if the `extensionAlias` thing is still necessary, but I already had that around to help it resolve the TS sources from dependencies. Here I've also added `conditionNames` to Webpack's `resolve` config, again selecting on which environment I'm in to add a different condition as the first item.
+
+### Other tools
+
+What you need to look for is a way to specify "conditions" or "custom conditions" in your tool, and follow the `development` / `production` pattern.
+
+Not all tools support these, unfortunately. If your tools can't be configured to accept conditions, you may need to fall back on my old hack: Hijack the `import` condition and use it for your TS sources.
 
 ## Show me an example
 
@@ -104,18 +187,16 @@ I'm doing this in my monorepo for my groceries and cooking app, [Gnocchi](https:
 
 ## If you publish any of your libraries, read this too
 
-I would be remiss if I didn't warn you that I'm not using all the tools here as designed. `--conditions` is perfectly fine (I think), but the real hack here is pointing `imports` to Typescript sources.
+`production` and `development` are community standards, but even so, you may not want to leave them in your exports config if you publish any of your libraries to a registry.
 
-If you publish your libraries to NPM or another registry, these exports are not correct for your users, who will expect `imports` to point to transpiled ESM Javascript files.
-
-Luckily I'm using PNPM, which supports `publishConfig` in `package.json`. `publishConfig` overrides the base config when publishing, which is perfect for undoing our little hack. So the `package.json` for a published module would look something like this:
+Luckily I'm using PNPM, which supports `publishConfig` in `package.json`. `publishConfig` overrides the base config when publishing, which is perfect for undoing these conditions and providing a more typical exports config. So the `package.json` for a published module would look something like this:
 
 ```json
 {
   "exports": {
     ".": {
-      "prod": "./dist/index.js",
-      "import": "./src/index.ts",
+      "production": "./dist/index.js",
+      "development": "./src/index.ts",
       "default": "./dist/index.js"
     }
   },
@@ -130,20 +211,20 @@ Luckily I'm using PNPM, which supports `publishConfig` in `package.json`. `publi
 }
 ```
 
-Now ESM users can import your published library.
+Now we don't need to worry about anything strange happening because of our local development convenience tricks.
 
 ## One last thing
 
-Perhaps you work alone, but it's always good to document hacks. I like to use _another_ hack to stick comments in `package.json`...
+Perhaps you work alone, but it's always good to document uncommon configurations. I like to use _another_ hack to stick comments in `package.json`...
 
 ```json
 {
   "exports": {
     ".": {
       "//": "This is our custom condition for Node to find our JS files. TS ignores it.",
-      "prod": "./dist/index.js",
+      "production": "./dist/index.js",
       "///": "And this lets TS use our ts source files at dev time!",
-      "import": "./src/index.ts",
+      "development": "./src/index.ts",
 ```
 
 Be a good citizen!
