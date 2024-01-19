@@ -156,6 +156,16 @@ When running Vite, I set an explicit mode just to be sure:
 		"build": "vite build --mode production",
 ```
 
+Again, _be sure to transpile dependencies before building_ -- we've told Vite to look at the `production` condition for build mode, which points to the output JS files.
+
+For example, in my Vercel config for my Vite app build, I've changed the build command to (remember this is a monorepo, hence `../..`):
+
+```
+cd ../.. && pnpm --filter @aglio/react... run build
+```
+
+PNPM knows that `@aglio/react...` means build all dependencies of the project before building the project.
+
 ### For NextJS (with Webpack config, at least)
 
 I'm not on the cutting edge of NextJS, honestly their config kinda confuses me. But I know this at least works: I specify the conditions as part of the Webpack config.
