@@ -120,6 +120,7 @@ At risk of stating the obvious, let's recap all of the adverse outcomes of this 
 - Our code is less computationally efficient
 - Our code is more complicated to understand
 - Any other future (or current) user of `randomInt` is going to have to 'solve' this problem again
+- Our 'solution' doesn't even fix the problem, it only estimates a fix. The first item will still show up more often, just maybe not noticeably so.
 
 Just one small instance of only solving the _effects_ has multiplied our tech debt in a substantial way. And _every_ instance of this happening will do the same. Hit the same connected systems often enough and the rot only multiplies further.
 
