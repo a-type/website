@@ -546,6 +546,8 @@ This is a problem I’m still figuring out myself. If you’ve got simple soluti
 
 ### Establish and update CSS vars for the viewport “safe area”
 
+> **Note:** Recent experimentation has indicated this may no longer be necessary on Android. Try going without and seeing how it works for you. I'm currently testing out just using `position: fixed` and `bottom: 0` alone.
+
 When the virtual keyboard appears or disappears, it will trigger a `resize` event on `window.visualViewport` (did you know that was a thing?).
 
 So what I start off with is listening to that event and the window’s `scroll` event, and triggering a callback to apply some CSS vars to the document which I can use elsewhere in CSS calculations.
@@ -717,7 +719,9 @@ Yeah, stop and think about how you’d do that with your web app! Keep in mind i
   great.
 </Caption>
 
-If you really want to show off, try doing this in your app. I did it with [Gnocchi](https://biscuits.club/gnocchi), and it was challenging but fun to pull off. I had to create my own client-side routing library! My approach was to create a component which could render the UI for any particular URL, even if that URL doesn’t match the browser’s current location. Then, when the user’s gesture triggers a threshold of movement, I render the page to the left or right of the current one, using CSS `transform` to control the displacement according to finger position.
+~~If you really want to show off, try doing this in your app. I did it with [Gnocchi](https://biscuits.club/gnocchi), and it was challenging but fun to pull off. I had to create my own client-side routing library! My approach was to create a component which could render the UI for any particular URL, even if that URL doesn’t match the browser’s current location. Then, when the user’s gesture triggers a threshold of movement, I render the page to the left or right of the current one, using CSS `transform` to control the displacement according to finger position.~~
+
+Update: I don't use this anymore for top-level navigation, as it feels distracting in practice. But it still makes tab navigation (where tabs are at the top) more native-feeling and easier to access on a phone.
 
 <Video src="/images/blog/pwa-native/gnocchi-nav-gestures.mp4" />
 <Caption>
