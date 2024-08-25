@@ -7,7 +7,7 @@ heroImage: '/images/blog/\mitchell-luo-G5i9LQ7sPOw-unsplash.jpg'
 heroCredit: 'Mitchell Luo on Unsplash'
 ---
 
-My cooking app, [Gnocchi](https://gnocchi.club), does not help you find recipes.
+My cooking app, [Gnocchi](https://biscuits.club/gnocchi), does not help you find recipes.
 
 There's no weekly newsletter, no hub for self-published recipes and comment boxes, no home feed to scroll.
 
@@ -45,7 +45,7 @@ I'm not saying this is a malicious thing. Yes, there's the ad impressions incent
 
 So I thought, maybe I can do this differently. I've built up a lot of skills I need to launch a web app over the years, and I love cooking and have some opinions about how I want to go about it. And since I've observed this anti-pattern at play, I also have a good shot at avoiding it if I'm careful about how I proceed.
 
-That process eventually lead to [Gnocchi](https://gnocchi.club), but first I had to create [Verdant](https://verdant.dev), my local-first web toolkit. To reinvent how web products work on a business level, I had to do a little re-invention of the technical level, too. Local-first is a burgeoning space with a lot of talented and creative builders, I'd recommend taking a look.
+That process eventually lead to [Gnocchi](https://biscuits.club/gnocchi), but first I had to create [Verdant](https://verdant.dev), my local-first web toolkit. To reinvent how web products work on a business level, I had to do a little re-invention of the technical level, too. Local-first is a burgeoning space with a lot of talented and creative builders, I'd recommend taking a look.
 
 I go into this more at length elsewhere, but one of the core motivators for me going to local-first was sustainable "free trials" — software runs on the user's device, not my servers, so I can let people use it for free without running a deficit. This aligns the incentives for paying (access to server-powered features like sync and multiplayer) with my incentives as a maker (I don't have to buy server time unless people are paying me for it). Compare that to traditional cloud models, where every free user costs you money. It's a little simplistic, but **I think that misalignment is the source of a lot of the web's problems**, and drives the ad- (or data)-economy dysfunction which leads product managers to distort perfectly usable _tools_ into _lifestyle products_ and _ecosystems_ that keep your attention captive.
 

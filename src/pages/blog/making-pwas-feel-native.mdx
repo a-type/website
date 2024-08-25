@@ -18,8 +18,8 @@ But first, for the native elitists… yeah, I know a single-threaded browser vie
 
 Also, this isn’t the kind of post where I’m going to give you a bunch of code to copy and try. Most of this stuff is highly dependent on how your app works. What I’m going over here are _principles_, the implementation is up to you.
 
-> [![The title card for Gnocchi.club, my groceries app. It shows a pan with various ingredients in it, and a screenshot of the grocery list page in the app.](https://gnocchi.club/og-image.png)](https://gnocchi.club)
-> Almost every technique I cover here, I've put into practice in my latest app, [Gnocchi](https://gnocchi.club), which I've been building over the past year both as a useful grocery list and recipe manager, but also an experiment to see how far I could push web app UX. And I'm pretty happy with the results! See for yourself.
+> [![The title card for Gnocchi, my groceries app. It shows a pan with various ingredients in it, and a screenshot of the grocery list page in the app.](https://gnocchi.biscuits.club/og-image.png)](https://biscuits.club/gnocchi)
+> Almost every technique I cover here, I've put into practice in my latest app, [Gnocchi](https://biscuits.club/gnocchi), which I've been building over the past year both as a useful grocery list and recipe manager, but also an experiment to see how far I could push web app UX. And I'm pretty happy with the results! See for yourself.
 
 # It starts with a PWA
 
@@ -464,7 +464,7 @@ Some actions should trigger an immediate transition, even if that means showing 
 <Video src="/images/blog/pwa-native/create-recipe.mp4" />
 <Caption>
   A purposefully broken create recipe flow demonstrated in my app,{' '}
-  <a target="_blank" href="https://gnocchi.club">
+  <a target="_blank" href="https://biscuits.club/gnocchi">
     Gnocchi.
   </a>
 </Caption>
@@ -717,12 +717,12 @@ Yeah, stop and think about how you’d do that with your web app! Keep in mind i
   great.
 </Caption>
 
-If you really want to show off, try doing this in your app. I did it with [Gnocchi](https://gnocchi.club), and it was challenging but fun to pull off. I had to create my own client-side routing library! My approach was to create a component which could render the UI for any particular URL, even if that URL doesn’t match the browser’s current location. Then, when the user’s gesture triggers a threshold of movement, I render the page to the left or right of the current one, using CSS `transform` to control the displacement according to finger position.
+If you really want to show off, try doing this in your app. I did it with [Gnocchi](https://biscuits.club/gnocchi), and it was challenging but fun to pull off. I had to create my own client-side routing library! My approach was to create a component which could render the UI for any particular URL, even if that URL doesn’t match the browser’s current location. Then, when the user’s gesture triggers a threshold of movement, I render the page to the left or right of the current one, using CSS `transform` to control the displacement according to finger position.
 
 <Video src="/images/blog/pwa-native/gnocchi-nav-gestures.mp4" />
 <Caption>
   My app,{' '}
-  <a href="https://gnocchi.club" target="_blank">
+  <a href="https://biscuits.club/gnocchi" target="_blank">
     Gnocchi
   </a>
   , uses swipe-based navigation. It was a pain but it's fun to play with!
