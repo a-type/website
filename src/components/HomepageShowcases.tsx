@@ -63,11 +63,11 @@ export function OldShowcase({}: OldShowcaseProps) {
 				title="Lo-fi subway sketch"
 				description="A WebGL subway animation I made for Verdant's previous incarnation"
 			/>
-			<ShowcaseItem
+			{/* <ShowcaseItem
 				url="/projects/clouds"
 				title="Clouds"
 				description="A procedural 3d cloudscape"
-			/>
+			/> */}
 			<ShowcaseItem
 				url="/blog/alarm-clock"
 				title="Building my own smart alarm clock"
