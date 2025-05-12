@@ -8,16 +8,6 @@ export const presetOptions = {
 	roundedness: 1,
 	scale: 'md',
 	saturation: 70,
-	customTheme: {
-		primary: {
-			hue: 182,
-			hueRotate: 4,
-		},
-		accent: {
-			hue: 90,
-			hueRotate: 4,
-		},
-	},
 	spacingScale: 1,
 } as Parameters<typeof preset>[0];
 

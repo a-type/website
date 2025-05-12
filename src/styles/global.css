@@ -32,3 +32,10 @@ body {
 	overflow-wrap: break-word;
 	min-height: 100vh;
 }
+
+:root {
+	--dyn-primary-source: 182;
+	--dyn-primary-hue-rotate: 4;
+	--dyn-accent-source: 90;
+	--dyn-accent-hue-rotate: 6;
+}
