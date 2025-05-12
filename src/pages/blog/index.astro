@@ -1,9 +1,11 @@
 ---
+import { Box, Provider } from '@a-type/ui';
+import '@a-type/ui/main.css';
 import BaseHead from '../../components/BaseHead.astro';
-import Header from '../../components/Header.astro';
+import { BlogPosts } from '../../components/BlogPosts';
 import Footer from '../../components/Footer.astro';
-import { SITE_TITLE, SITE_DESCRIPTION, SHOW_FUTURE_POSTS } from '../../config';
-import Main from '../../components/Main.astro';
+import Header from '../../components/Header.astro';
+import { SHOW_FUTURE_POSTS, SITE_DESCRIPTION, SITE_TITLE } from '../../config';
 
 // Use Astro.glob() to fetch all posts, and then sort them by date.
 const posts = (await Astro.glob('./*.{md,mdx}'))
@@ -23,52 +25,14 @@ const posts = (await Astro.glob('./*.{md,mdx}'))
 <html lang="en-us">
   <head>
     <BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
-    <style>
-      ul {
-        list-style-type: none;
-        padding: unset;
-      }
-      ul li {
-        display: flex;
-      }
-      ul li time {
-        flex: 0 0 130px;
-        font-style: italic;
-        color: #888;
-      }
-      ul li a:visited {
-        color: #8e32dc;
-      }
-    </style>
   </head>
   <body>
     <Header />
-    <Main>
-      <section>
-        <ul>
-          {
-            posts.map((post) => (
-              <li>
-                <time datetime={post.frontmatter.pubDate}>
-                  {new Date(post.frontmatter.pubDate).toLocaleDateString(
-                    'en-us',
-                    {
-                      year: 'numeric',
-                      month: 'short',
-                      day: 'numeric',
-                    },
-                  )}
-                </time>
-                <div>
-                  <a href={post.url}>{post.frontmatter.title}</a>
-                  <p>{post.frontmatter.description}</p>
-                </div>
-              </li>
-            ))
-          }
-        </ul>
-      </section>
-    </Main>
+    <Provider client:load>
+      <Box p="lg" gap d="col" full>
+        <BlogPosts posts={posts} client:load />
+    </Box>
+    </Provider>
     <Footer />
   </body>
 </html>

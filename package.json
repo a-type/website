@@ -10,28 +10,32 @@
     "astro": "astro"
   },
   "dependencies": {
-    "@astrojs/mdx": "^0.11.1",
-    "@astrojs/react": "^2.2.1",
-    "@astrojs/rss": "^1.0.0",
-    "@astrojs/sitemap": "^1.0.0",
-    "@react-three/drei": "^9.77.3",
-    "@react-three/fiber": "^8.13.3",
-    "@react-three/postprocessing": "^2.14.11",
-    "@types/react": "18.0.21",
-    "@types/react-dom": "18.0.6",
-    "astro": "^1.1.5",
-    "date-fns": "^2.29.3",
-    "leva": "^0.9.35",
-    "react": "18.0.0",
-    "react-dom": "18.0.0",
+    "@a-type/ui": "^2.1.6",
+    "@astrojs/mdx": "^4.2.6",
+    "@astrojs/react": "^4.2.7",
+    "@astrojs/rss": "^4.0.11",
+    "@astrojs/sitemap": "^3.4.0",
+    "@react-three/drei": "^10.0.7",
+    "@react-three/fiber": "^9.1.2",
+    "@react-three/postprocessing": "^3.0.4",
+    "@types/react": "19.1.4",
+    "@types/react-dom": "19.1.4",
+    "@unocss/reset": "^66.1.1",
+    "@unocss/transformer-variant-group": "^66.1.1",
+    "astro": "^5.7.12",
+    "date-fns": "^4.1.0",
+    "leva": "^0.10.0",
+    "react": "19.1.0",
+    "react-dom": "19.1.0",
     "react-use-gesture": "^9.1.3",
-    "remark-toc": "^8.0.1",
+    "remark-toc": "^9.0.0",
     "seedrandom": "^3.0.5",
-    "three": "^0.153.0",
-    "tumult": "^3.0.14"
+    "three": "^0.176.0",
+    "tumult": "^3.0.14",
+    "unocss": "^66.1.1"
   },
   "devDependencies": {
-    "@types/seedrandom": "^3.0.5",
-    "@types/three": "^0.152.1"
+    "@types/seedrandom": "^3.0.8",
+    "@types/three": "^0.176.0"
   }
 }

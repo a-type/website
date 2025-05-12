@@ -1,9 +1,12 @@
 ---
+import { Provider } from '@a-type/ui';
 ---
 
-<main>
-  <slot />
-</main>
+<Provider client:load>
+  <main>
+    <slot />
+  </main>
+</Provider>
 <style>
   main {
     flex: 1 0 auto;

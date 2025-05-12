@@ -1,12 +1,16 @@
 ---
 import BaseHead from '../components/BaseHead.astro';
-import Footer from '../components/Footer.astro';
-import Main from '../components/Main.astro';
-import { SITE_DESCRIPTION, SITE_TITLE } from '../config';
-import Links from '../components/Links.astro';
 import ExternalLink from '../components/ExternalLink.astro';
-import Showcase from '../components/Showcase.astro';
-import ShowcaseItem from '../components/ShowcaseItem.astro';
+import Footer from '../components/Footer.astro';
+import { MainShowcase, OldShowcase } from '../components/HomepageShowcases';
+import { Links } from '../components/Links';
+import { JobNote } from '../components/JobNote';
+
+import { Box, Button, ColorModeToggle, H1, H2, Icon, Note, P, Provider } from '@a-type/ui';
+
+import '@a-type/ui/main.css';
+
+import { SITE_DESCRIPTION, SITE_TITLE } from '../config';
 ---
 
 <!DOCTYPE html>
@@ -14,136 +18,38 @@ import ShowcaseItem from '../components/ShowcaseItem.astro';
   <head>
     <BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
   </head>
-  <body>
-    <style>
-      h1 {
-        font-size: 20vmin;
-        margin-bottom: 2.5vmin;
-        margin-top: 0;
-        line-height: 1.2;
-      }
-      h2 {
-        font-size: 10vmin;
-        margin-top: 0;
-      }
-
-      @media (min-width: 768px) {
-        h1 {
-          font-size: 10vmin;
-        }
-        h2 {
-          font-size: 5vmin;
-        }
-      }
-
-      h1,
-      h2 {
-        font-family: 'Cormorant', serif;
-        font-weight: 100;
-        font-style: italic;
-      }
-
-      p {
-        line-height: 2;
-      }
-
-      .showcases {
-        flex: 1;
-      }
-    </style>
-    <Main>
-      <h1>{SITE_TITLE}</h1>
-      <p>
-        got started in enterprise dashboards, moonlit in <ExternalLink
-          href="https://github.com/a-type?tab=repositories&type=source"
-          >open source</ExternalLink
-        >, and then jumped straight into <ExternalLink
-          href="https://popspace.io">spatial canvas</ExternalLink
-        >. Now I'm working on
-      </p>
-      <h2>local-first apps</h2>
-      <Showcase>
-        <ShowcaseItem
-          href="https://biscuits.club"
-          image="/images/showcase/biscuits.png"
-        >
-          Biscuits
-        </ShowcaseItem>
-        <ShowcaseItem
-          href="https://verdant.dev"
-          image="/images/showcase/verdant.png"
-        >
-          Verdant
-        </ShowcaseItem>
-      </Showcase>
-      <h2>...and more</h2>
-      <ul>
-        <li>
-          <ExternalLink
-            href="https://popstage.com"
-            target="_blank"
-            rel="noopener noreferrer">PopStage</ExternalLink
-          >
-          <span> | Collaborative workshop venue</span>
-        </li>
-        <li>
-          <ExternalLink href="https://popspace.io">PopSpace</ExternalLink>
-          <span> | Online spatial meeting spaces&nbsp;</span>
-          <ExternalLink
-            href="https://www.loom.com/share/3c010e7b79114695a5b356579aafb1b7?sid=6ea72b48-af76-4b4d-94cb-2ba38f9f4ad1"
-          >
-            (Demo and technical overview)
-          </ExternalLink>
-        </li>
-        <li>
-          <a href="/projects/subway"
-            >A WebGL subway animation I made for an old project</a
-          >
-        </li>
-        <li>
-          <a href="/projects/clouds">A procedural 3d cloudscape</a>
-        </li>
-        <li>
-          <a href="/blog/alarm-clock">Building my own smart alarm clock</a>
-        </li>
-        <li>
-          <ExternalLink
-            href="https://youtu.be/TH-78-I6Eh0?list=PLTbD2QA-VMnXFsLbuPGz1H-Najv9MD2-H&t=82"
-          >
-            My talk for the local-first web community
-          </ExternalLink>
-        </li>
-        <li>
-          <ExternalLink href="https://a-type.github.io/calendar-blocks/">
-            Calendar Blocks
-          </ExternalLink>, a set of flexible primitives for React date pickers
-        </li>
-      </ul>
-      <h3>Older stuff</h3>
-      <ul>
-        <li>
-          <ExternalLink href="https://github.com/a-type/graphql-arangodb">
-            GraphQL-ArangoDB
-          </ExternalLink>, translates whole GraphQL queries to AQL
-        </li>
-        <li>
-          <ExternalLink href="https://a-type.github.io/react-ambient/">
-            React Ambient
-          </ExternalLink>, easy dynamic backgrounds for React
-        </li>
-        <li>
-          <ExternalLink href="https://github.com/a-type/converge">
-            Converge
-          </ExternalLink>, (defunct) peer-to-peer messaging on the web
-        </li>
-        <li>
-          <ExternalLink href="https://dimension-dom.netlify.app/">
-            Dimension
-          </ExternalLink>, tools for multi-axis keyboard navigation
-        </li>
-      </ul>
-      <Links />
-    </Main>
-    <Footer />
+  <body class="bg-gray-light">
+    <Provider client:load>
+      <Box d={{ default: 'col', md: 'row' }} gap p>
+        <Box d="col" gap p className="flex-shrink-1 flex-basis-200px flex-grow-[1]">
+          <H1 className="[font-family:Cormorant_serif] italic font-light text-3xl md:text-4xl">{SITE_TITLE}</H1>
+          <P className="text-xs color-gray-dark leading-loose">
+            got started in enterprise dashboards, moonlit in <ExternalLink
+              href="https://github.com/a-type?tab=repositories&type=source"
+              >open source</ExternalLink
+            >, and then jumped straight into <ExternalLink
+              href="https://popspace.io">spatial canvas</ExternalLink
+            >. now I'm working on local-first web apps and other B2C moonshot ideas.
+          </P>
+          <Links className="gap-sm"/>
+          <ColorModeToggle client:load className="mr-auto p-xs" />
+          <JobNote client:load />
+        </Box>
+        <Box d="col" gap className="flex-grow-[5] flex-basis-600px flex-shrink-1">
+          <Box d="col" gap="lg" p surface="wash">
+            <Box d="col" gap="sm">
+              <H2>Active projects</H2>
+              <P className="color-gray-dark text-xs">(I stay busy)</P>
+            </Box>
+            <MainShowcase client:load />
+          </Box>
+          <Box d="col" gap="lg" p surface="wash">
+            <H2>Old stuff</H2>
+            <OldShowcase client:load />
+          </Box>
+        </Box>
+      </Box>
+      <Footer />
+    </Provider>
   </body>
 </html>

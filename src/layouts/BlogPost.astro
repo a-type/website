@@ -1,9 +1,10 @@
 ---
+import '@a-type/ui/main.css';
 import '../styles/blog-post.css';
 
 import BaseHead from '../components/BaseHead.astro';
-import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
+import Header from '../components/Header.astro';
 import Main from '../components/Main.astro';
 
 export interface Props {
@@ -43,7 +44,7 @@ const {
 <body>
   <Header />
   <Main>
-    <article>
+    <article class="max-w-80ch mx-auto">
       {
         heroImage && (
           <>
