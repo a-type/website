@@ -7,7 +7,7 @@ heroImage: '/images/blog/resource-database-I12XKpvVz9g-unsplash.jpg'
 heroCredit: 'Resource Database on Unsplash'
 ---
 
-> lo-fi series
+> Local-first series
 >
 > 1. [The goal](/blog/lofi-intro)
 > 2. [Sync](/blog/lofi-sync)
@@ -46,7 +46,7 @@ Operations apply patches. Patches are changes that combine to make to a document
 
 For example:
 
-```
+```ts
 {
   op: 'set',
   name: 'bar',
@@ -54,9 +54,9 @@ For example:
 }
 ```
 
-The value at `name` of the given object is replaced with `1` in this example.
+The value at key `bar` of the given object is replaced with `1` in this example.
 
-So any time you modify a document, instead of directly assigning to properties, lo-fi generates a list of operations which contain instructions like above. Successive application, in order, of all of these instructions computes the canonical data for your object (which, for performance's sake, is often cached in-memory).
+So any time you modify a document, instead of directly assigning to properties, Verdant generates a list of operations which contain instructions like above. Successive application, in order, of all of these instructions computes the canonical data for your object (which, for performance's sake, is often cached in-memory).
 
 ### Objects and object references
 
@@ -173,7 +173,7 @@ There's some additional metadata in the server's response that's useful, but tha
 
 Of course, once you're online, we want things to be more responsive. Syncing operations as they happen lets us have full realtime multiplayer quite easily! Whenever a change is made to a document, the replica sends that operation in a message to the server. The server then rebroadcasts the operation to all of its peers.
 
-In lo-fi, clients don't stream operations immediately to the server by default - they batch them to reduce traffic. Batching timerange is configurable.
+In Verdant, clients don't stream operations immediately to the server by default - they batch them to reduce traffic. Batching timerange is configurable.
 
 ### What happens when a replica receives operations
 
@@ -242,3 +242,5 @@ So, when a replica detects it has never synced before, it also sends its local b
 ## Wrapping up
 
 Hopefully that was clear enough to illuminate my approach to syncing local-first data. It's not the only way, by a long shot, but it aligns with my personal project goals, and so far, it works!
+
+> Next up: [Migrations](/blog/lofi-migrations)

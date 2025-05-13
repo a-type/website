@@ -26,7 +26,8 @@ const {
 <style>
   .title {
     font-size: 2em;
-    margin: 0.25em 0 0;
+    margin: 0.25em 0 0.5em;
+    font-family: 'Cormorant', serif;
   }
   .credit {
     font-size: 0.6em;
@@ -38,19 +39,25 @@ const {
     border-top: 1px solid #ddd;
     margin: 1rem 0;
   }
+  a {
+    color: var(--color-primary-dark);
+    text-decoration: underline;
+  }
+  body {
+    overflow-x: hidden;
+    overflow-y: auto;
+  }
 </style>
 <BaseHead title={title} description={description} />
 
 <body>
   <Header />
   <Main>
-    <article class="max-w-80ch mx-auto">
+    <article class="post-content">
       {
         heroImage && (
           <>
             <img
-              width={720}
-              height={360}
               class="hero-image"
               src={heroImage}
               alt={heroCredit}
@@ -62,7 +69,7 @@ const {
       <h1 class="title">{title}</h1>
       {
         pubDate && (
-          <time>
+          <time class="text-xs text-gray-dark italic">
             {new Date(pubDate).toLocaleDateString('en-us', {
               year: 'numeric',
               month: 'short',

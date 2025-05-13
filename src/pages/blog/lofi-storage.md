@@ -5,7 +5,7 @@ description: 'hacking unicode for advanced querying'
 pubDate: 'Dec 31 2022'
 ---
 
-> lo-fi series
+> Local-first series
 >
 > 1. [The goal](/blog/lofi-intro)
 > 2. [Sync](/blog/lofi-sync)
@@ -28,11 +28,11 @@ Let's model a simple compound query, "items in category 'development' in ascendi
 
 ```ts
 interface Post {
-  id: string;
-  tags: string[];
-  category: string;
-  content: string;
-  published: boolean;
+	id: string;
+	tags: string[];
+	category: string;
+	content: string;
+	published: boolean;
 }
 ```
 
@@ -40,11 +40,11 @@ First, before storing each Post, we write a new 'invisible' value to it for our 
 
 ```ts
 const post = {
-  id: cuid(),
-  tags: ['react'],
-  category: 'development',
-  content: 'useEffect is back, baby!',
-  published: false,
+	id: cuid(),
+	tags: ['react'],
+	category: 'development',
+	content: 'useEffect is back, baby!',
+	published: false,
 };
 
 post.category_id = `${post.category}\uFFFFFE${post.id}`;

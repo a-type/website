@@ -7,7 +7,7 @@ heroImage: '/images/blog/mariola-grobelska-n3JPNo11Aac-unsplash.jpg'
 heroCredit: 'Mariola Grobelska on Unsplash'
 ---
 
-> lo-fi series
+> Local-first series
 >
 > 1. [The goal](/blog/lofi-intro)
 > 2. [Sync](/blog/lofi-sync)
@@ -26,7 +26,7 @@ The costs grow on two fronts: infrastructure and team size. Diminishing returns 
 
 It's not a bad thing, on the whole. It's not the end of the world. But it's always the end of an era, and I always miss that era.
 
-When it comes to personal endeavors, I tend to bail when that shadow starts looming on the horizon. The threat of 'no going back' really kills my momentum. The point at which you're looking down the barrel of spending so enough on that hobby project you either have to make revenue or seek funding (accelerating the loss of control). Taking money from people crosses a threshold. It's not something I feel I can ever take lightly.
+When it comes to personal endeavors, I tend to bail when that shadow starts looming on the horizon. The threat of 'no going back' really kills my momentum. The point at which you're looking down the barrel of spending so much on that hobby project you either have to make revenue or seek funding (accelerating the loss of control). Taking money from people crosses a threshold. It's not something I feel I can ever take lightly.
 
 I used to worry this was a lack of grit, a personal defect. That I was just not cut out for building things _for real_, just dreaming.
 
@@ -46,7 +46,7 @@ Writing to a local database isn't so bad, but these new baseline features are _h
 
 For example, in the peer-to-peer realm. It's fun to get something up and running on a system like GunDB or IPFS. But -- and this may be just a personal limitation in my thinking -- once you decide to go full distributed and embrace cryptography as a hammer, the proliferation of nails is pretty daunting. I guess my experience is that trustless systems spend a lot of time, energy, and complexity solving problems inherent to their own design, unrelated to application goals.
 
-Meanwhile you can certainly use CRDTs in a more traditional setup, and many do. But there seem to be tradeoffs in most CRDT implementations I've dug into which rub me the wrong way -- specifically, unbounded growth of data storage. Right now I'm building a [grocery list app](https://aglio.gfor.rest), and the whole point of it is to check off items and feel the satisfaction of deleting them, of completing your list. Knowing those deleted items might remain 'tombstoned' but stored indefinitely makes me uneasy. It could be I'm just ignorant of how that process works... in fact, it's likely, since CRDTs are quite complicated. It's hard to justify why I turn away from CRDTs as a general solution, but I think my gut feeling on this is that generic CRDT work seems to aim to be useful in a wider range of scenarios than I need, and those kinds of constraints always introduce trade-offs in complexity or features.
+Meanwhile you can certainly use CRDTs in a more traditional setup, and many do. But there seem to be tradeoffs in most CRDT implementations I've dug into which rub me the wrong way -- specifically, unbounded growth of data storage. Right now I'm building a [grocery list app](https://gnocchi.biscuits.club), and the whole point of it is to check off items and feel the satisfaction of deleting them, of completing your list. Knowing those deleted items might remain 'tombstoned' but stored indefinitely makes me uneasy. It could be I'm just ignorant of how that process works... in fact, it's likely, since CRDTs are quite complicated. It's hard to justify why I turn away from CRDTs as a general solution, but I think my gut feeling on this is that generic CRDT work seems to aim to be useful in a wider range of scenarios than I need, and those kinds of constraints always introduce trade-offs in complexity or features.
 
 And anyway, I can't learn and know everything before pushing forward. I decided to draw the line somewhere. It's in my nature to build in order to learn. And I felt that if I could apply a few important constraints to this problem, I could produce a solution that works much better for me than what I've seen so far.
 
@@ -56,17 +56,17 @@ So I took inventory of my needs.
 
 I'm still in pursuit of something I can build and host myself. Something which embraces simplicity as much as possible for as long as possible. Something which won't steer me into a scale trap, costing more and more in time and money until I am forced to sacrifice control to keep the machine alive. Or at least stave off that moment as long as possible, allowing me to explore and experiment.
 
-I also want to avoid unknown unknowns as much as I can. Of course, the point is they're 'unknown,' right? Avoiding something you can't anticipate is a matter of strategy, I think. I choose to take a pass on emerging paradigms, like peer-to-peer, in favor of paradigms where at least some of my problems (like authentication and identity) are so thoroughly solved it's boring.
+I also want to avoid unknown unknowns as much as I can. Of course, the point is they're 'unknown,' right? Avoiding something you can't anticipate is a matter of strategy, I think. I chose to pass on emerging paradigms, like peer-to-peer, in favor of paradigms where at least some of my problems (like authentication and identity) are so thoroughly solved it's boring.
 
 And in the principle of local-first, I'd love to have a system where local usage is free, for me and everyone else. A static webpage which provides the core of the product that I can host indefinitely for the cost of a domain name. It's such a nice feeling to imagine that people who want to can still use my software even if I can't manage to make it work as a hosted service business.
 
 Simplicity is a difficult thing to accomplish. It requires a lot of focus, and often, compromise.
 
-# Creating lofi
+# Creating Verdant
 
-So I decided to begin from these ideas, combine it with my product goals for [Aglio](https://aglio.gfor.rest), and identify priorities which would guide my implementation.
+So I decided to begin from these ideas, combine it with my product goals for [Gnocchi](https://gnocchi.biscuits.club), and identify priorities which would guide my implementation.
 
-1. **Cloud syncing**: My devices should not have to be online concurrently to sync with each other.
+1. **Cloud syncing**: My devices should not have to be online concurrently to sync with each other, like with peer-to-peer.
 2. **Storage friendly** Storage usage should grow and _shrink_ relative to the undeleted data I am storing. 'Deleted' data should eventually be truly deleted.
 3. **Traditionally authorized** Authentication should not be a concern of the data layer. Any authorization should have a trusted user identity to work with.
 4. **Multiplayer-ready** Conflicts should be resolved automatically and instantly, within reason.
@@ -83,7 +83,7 @@ There are also common concerns of local-first or peer-to-peer data layers I expl
 
 I've built a prototype system to solve my own problem: I wanted to create a small, friendly, _cheap_ web app which I could host indefinitely without getting sucked into a cycle of continual product growth in order to pay the bills. But I also didn't want to abandon more traditional client-server simplicity and complicate my life with the concerns of peer-to-peer highly distributed trustless systems. Something I could have full understanding and control of, which was as free as a webpage for local-only users, and as cheap as a single Node server for anyone who wanted sync or realtime features.
 
-So that's what I'm building. I hope I can release it in a reusable set of packages soon!
+So that's what I'm building. I hope I can release it in a reusable set of packages soon! (Update: https://verdant.dev).
 
 ## But really, why?
 
@@ -100,3 +100,5 @@ But perhaps the biggest threat of all to me is what I call the 'scale trap,' as 
 I don't really want to maximize profits, to be honest. I don't want to be beholden to stakeholders or investors. If I could sell a small product, for a small price, to a small number of people, and still make enough to live on... that would be great. Build things I think are meaningful, make as much as I need, and spend the rest of my time and energy on living.
 
 My latest work is an experiment toward that end. It exists, not just because of what I think, but what I feel. What I hope for.
+
+> Next up: [Sync](/blog/lofi-sync)

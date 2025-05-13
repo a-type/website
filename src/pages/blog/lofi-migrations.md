@@ -7,7 +7,7 @@ heroImage: '/images/blog/susan-wilkinson-vnus9kq-96w-unsplash.jpg'
 heroCredit: 'Susan Wilkinson on Unsplash'
 ---
 
-> lo-fi series
+> Local-first series
 >
 > 1. [The goal](/blog/lofi-intro)
 > 2. [Sync](/blog/lofi-sync)
@@ -79,10 +79,10 @@ First, we need to imagine what the migration change was. Suppose we have a docum
 
 ```ts
 type Post = {
-  id: string;
-  content: string;
-  tags: string[];
-  title: string;
+	id: string;
+	content: string;
+	tags: string[];
+	title: string;
 };
 ```
 
@@ -90,11 +90,11 @@ now we migrate it to look like:
 
 ```ts
 type Post = {
-  id: string;
-  content: string;
-  tags: { name: string; color: string }[];
-  title: string;
-  summary: string;
+	id: string;
+	content: string;
+	tags: { name: string; color: string }[];
+	title: string;
+	summary: string;
 };
 ```
 
@@ -102,10 +102,10 @@ So we've expanded tags into an object, and added `summary`. We'll be working wit
 
 ```ts
 const post: Post = {
-  id: 'xyz',
-  content: 'Hello world',
-  tags: ['dev'],
-  title: 'First post',
+	id: 'xyz',
+	content: 'Hello world',
+	tags: ['dev'],
+	title: 'First post',
 };
 ```
 
@@ -159,18 +159,18 @@ Now in the meantime, back on version 1, Replica B modifies the `content` and add
 
 ```ts
 [
-  {
-    oid: 'posts/1',
-    op: 'set',
-    name: 'content',
-    content: 'Some new content',
-  },
+	{
+		oid: 'posts/1',
+		op: 'set',
+		name: 'content',
+		content: 'Some new content',
+	},
 ][
-  {
-    oid: 'posts/1:tags:abcd',
-    op: 'list-push',
-    value: 'react',
-  }
+	{
+		oid: 'posts/1:tags:abcd',
+		op: 'list-push',
+		value: 'react',
+	}
 ];
 ```
 
@@ -233,11 +233,11 @@ Our final document would look like this:
 
 ```ts
 const post: Post = {
-  id: 'xyz',
-  title: 'Initial post',
-  content: 'Some new content',
-  tags: [{ name: 'dev', color: '#ff0000' }, 'react'],
-  summary: 'First post in my blog',
+	id: 'xyz',
+	title: 'Initial post',
+	content: 'Some new content',
+	tags: [{ name: 'dev', color: '#ff0000' }, 'react'],
+	summary: 'First post in my blog',
 };
 ```
 
@@ -251,10 +251,10 @@ However, there's an interesting moment in our history, right before Replica A's 
 
 ```ts
 const post: Post = {
-  id: 'xyz',
-  title: 'Initial post',
-  content: 'Some new content',
-  tags: ['dev', 'react'],
+	id: 'xyz',
+	title: 'Initial post',
+	content: 'Some new content',
+	tags: ['dev', 'react'],
 };
 ```
 
@@ -262,34 +262,34 @@ When Replica B performs its local migration, it will see this state as the final
 
 ```ts
 [
-  {
-    oid: 'posts/1.tags.#:lmno1234',
-    op: 'init',
-    value: { name: 'dev', color: '#ff0000' },
-  },
-  {
-    oid: 'posts/1.tags:abcd',
-    op: 'set',
-    name: 0,
-    value: { '@@type': 'ref', id: 'posts/1.tags.#:lmno1234' },
-  },
-  {
-    oid: 'posts/1.tags.#:qwer4356',
-    op: 'init',
-    value: { name: 'react', color: '#00ff00' },
-  },
-  {
-    oid: 'posts/1.tags:abcd',
-    op: 'set',
-    name: 1,
-    value: { '@@type': 'ref', id: 'posts/1.tags.#:qwer4356' },
-  },
-  {
-    oid: 'posts/1',
-    op: 'set',
-    name: 'summary',
-    value: '',
-  },
+	{
+		oid: 'posts/1.tags.#:lmno1234',
+		op: 'init',
+		value: { name: 'dev', color: '#ff0000' },
+	},
+	{
+		oid: 'posts/1.tags:abcd',
+		op: 'set',
+		name: 0,
+		value: { '@@type': 'ref', id: 'posts/1.tags.#:lmno1234' },
+	},
+	{
+		oid: 'posts/1.tags.#:qwer4356',
+		op: 'init',
+		value: { name: 'react', color: '#00ff00' },
+	},
+	{
+		oid: 'posts/1.tags:abcd',
+		op: 'set',
+		name: 1,
+		value: { '@@type': 'ref', id: 'posts/1.tags.#:qwer4356' },
+	},
+	{
+		oid: 'posts/1',
+		op: 'set',
+		name: 'summary',
+		value: '',
+	},
 ];
 ```
 
@@ -388,14 +388,14 @@ With this ordering, we've successfully migrated all our data and avoided overwri
 
 ```ts
 const post: Post = {
-  id: 'xyz',
-  title: 'Initial post',
-  content: 'Some new content',
-  tags: [
-    { name: 'dev', color: '#ff0000' },
-    { name: 'react', color: '#00ff00' },
-  ],
-  summary: 'First post in my blog',
+	id: 'xyz',
+	title: 'Initial post',
+	content: 'Some new content',
+	tags: [
+		{ name: 'dev', color: '#ff0000' },
+		{ name: 'react', color: '#00ff00' },
+	],
+	summary: 'First post in my blog',
 };
 ```
 
@@ -410,3 +410,5 @@ But this object 'lives on' in our history. It's essentially a ghost now, so we n
 The good news is that deleting a document entirely will also delete all operations and baselines whose OIDs are prefixed by that document's OID - which means even those ghost objects will be deleted in the end. But for long-lived or immortal documents, you might see unnecessary storage clutter if your client makes shape-changing migrations like this frequently.
 
 On the other hand, such migrations aren't really that common. It's likely this bug will remain for a while since the priority isn't too high.
+
+> Next up: [Indexing and Queries](/blog/lofi-storage)

@@ -25,8 +25,14 @@ export function MainShowcase({}: MainShowcaseProps) {
 				description="Augmented reality furniture staging and home decoration"
 			/>
 			<ShowcaseItem
+				url="https://www.youtube.com/watch?v=Anae1TPI5VY"
+				title="My 2024 talk for the Triangle Devs meetup"
+				image="/images/showcase/triangle-talk.png"
+				description="I dig into how local-first works, my approach to migrating databases, and my hopes for sustainable software"
+			/>
+			<ShowcaseItem
 				url="https://youtu.be/TH-78-I6Eh0?list=PLTbD2QA-VMnXFsLbuPGz1H-Najv9MD2-H&t=82"
-				title="My talk for the local-first web community"
+				title="My 2023 talk for the local-first web community"
 				description="I describe my experience making local-first tooling and getting apps to market"
 			/>
 			<ShowcaseItem

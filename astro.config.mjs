@@ -8,8 +8,24 @@ import react from '@astrojs/react';
 // https://astro.build/config
 export default defineConfig({
 	site: 'https://gfor.rest',
+	markdown: {
+		shikiConfig: {
+			themes: {
+				light: 'vitesse-light',
+				dark: 'poimandres',
+			},
+		},
+	},
 	integrations: [
-		mdx(),
+		mdx({
+			shikiConfig: {
+				themes: {
+					light: 'vitesse-light',
+					dark: 'poimandres',
+				},
+			},
+			syntaxHighlight: 'shiki',
+		}),
 		sitemap(),
 		react(),
 		UnoCSS({
