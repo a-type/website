@@ -29,11 +29,15 @@ export function ShowcaseItem({
 					<img src={image} className="w-full h-full" />
 				</Card.Image>
 			)}
-			<Card.Main asChild>
+			<Card.Main asChild className="flex-[1_0_auto]">
 				<a rel="noopener noreferrer" target="_blank" href={url}>
-					<Card.Title className="font-light mb-auto">{title}</Card.Title>
+					<Card.Title className="font-light mb-auto flex-shrink-0">
+						{title}
+					</Card.Title>
 					{description && (
-						<Card.Content className="bg-wash">{description}</Card.Content>
+						<Card.Content className="bg-wash flex-shrink-0">
+							{description}
+						</Card.Content>
 					)}
 				</a>
 			</Card.Main>
