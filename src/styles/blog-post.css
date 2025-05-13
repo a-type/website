@@ -26,6 +26,7 @@ caption {
 pre.astro-code {
 	padding: 1rem;
 	border-radius: 0.5rem;
+	tab-size: 2ch;
 }
 
 @media (prefers-color-scheme: dark) {
