@@ -79,12 +79,16 @@ export function OldShowcase({}: OldShowcaseProps) {
 				url="/projects/subway"
 				title="Lo-fi subway sketch"
 				description="A WebGL subway animation I made for Verdant's previous incarnation"
+				image="/images/showcase/subway.png"
+				imageAlt="A view down the subway, kind of PS2-level graphics, with film grain and depth of field"
 			/>
-			{/* <ShowcaseItem
+			<ShowcaseItem
 				url="/projects/clouds"
 				title="Clouds"
 				description="A procedural 3d cloudscape"
-			/> */}
+				image="/images/showcase/clouds.png"
+				imageAlt="A 3D cloudscape seen from above, with big white clouds hovering over a patchwork green field"
+			/>
 			<ShowcaseItem
 				url="/blog/alarm-clock"
 				title="Building my own smart alarm clock"
