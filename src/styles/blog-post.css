@@ -23,8 +23,14 @@ caption {
 }
 
 .post-content a {
-	color: var(--color-primary-dark);
+	color: var(--color-primary-ink);
 	text-decoration: underline;
+}
+
+.post-content h2,
+.post-content h3,
+.post-content h4 {
+	color: var(--color-primary-ink);
 }
 
 pre.astro-code {
