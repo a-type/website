@@ -1,0 +1,31 @@
+---
+title: 'Volu'
+pubDate: '2024-11-20'
+layout: ../../layouts/BlogPost.astro
+backLink: '/'
+---
+
+Volu was a grant experiment in creating a full-featured spatial web IDE in the browser, and my first project at Volumetrics.
+
+<figure>
+	<video src="/videos/volu-editor.mp4" autoplay loop muted></video>
+	<figcaption>The Volu web editor</figcaption>
+</figure>
+
+The goal of Volu was to create a development environment for directly creating and tweaking ThreeJS-based scenes in XR headsets, closing the wide gap between idea and experience that continues to plague XR development.
+
+Volu featured a rich code editor, with JSX and Typescript support and automated Prettier formatting. The code you wrote ran right alongside it in the same browser, and featured rudimentary hot reloading, which was crucial to avoid interrupting a live XR session. The runtime instrumented your scene with error handling and console capture to show everything you need at a glance.
+
+In-headset, users could launch their scene and explore it, then background it to change parameters or connect a Bluetoothe keyboard for some serious editing.
+
+## My role
+
+I joined to Volumetrics as a vital web platform expert, ready to push some boundaries and create the best experience possible within the browser's notoriously constraining sandbox environment.
+
+In addition to R&D, I handled the full-stack basics of setting up a true web software product, including user authentication, project management, asset storage, and social features.
+
+## The outcome
+
+While we gathered some community of enthusiastic WebXR developers around the product, there were (perhaps unsurprisingly) significant setbacks which had much to do with our dependency on headset manufacturers and slow-evolving web standards. It was difficult to deliver a good user experience for code editing in XR headsets, period; doing so within the browser was doubly hard!
+
+Meta, in particular, seemed to constantly be iterating on user interaction paradigms and how they wanted their customers to engage with the device (more recently, steering towards their own Horizon Worlds ecosystem). This uncertainty, coupled with the very difficult technical challenges like hot reloading, ultimately led our small team to pivot away from such an ambitious undertaking.

@@ -54,6 +54,13 @@ export function OldShowcase({}: OldShowcaseProps) {
 	return (
 		<Showcase>
 			<ShowcaseItem
+				url="/projects/volu"
+				title="Volu"
+				description="An in-headset WebXR development environment"
+				image="/images/showcase/volu.png"
+				imageAlt="A code editor with a preview window showing a 3D cloud model"
+			/>
+			<ShowcaseItem
 				url="https://popspace.io"
 				title="PopSpace"
 				description="Online spatial meeting spaces. A prior startup."
