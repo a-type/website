@@ -9,18 +9,21 @@ export function MainShowcase({}: MainShowcaseProps) {
 			<ShowcaseItem
 				url="https://biscuits.club"
 				image="https://biscuits.club/og-image.png"
+				imageAlt="A phone running a grocery list app, with the title 'Biscuits' and tagline 'Scratch-Made Apps'"
 				title="Biscuits"
 				description="A suite of local-first web apps"
 			/>
 			<ShowcaseItem
 				url="https://verdant.dev"
 				image="https://verdant.dev/opengraph.png"
+				imageAlt="A green tree and the word 'Verdant'"
 				title="Verdant"
 				description="Local-first data and sync framework"
 			/>
 			<ShowcaseItem
 				url="https://alef.io"
 				image="/images/showcase/alef.png"
+				imageAlt="A capture from within an AR headset of a realspace room with virtual furniture models laid out within, and a floating menu"
 				title="Alef"
 				description="Augmented reality furniture staging and home decoration"
 			/>
@@ -28,6 +31,7 @@ export function MainShowcase({}: MainShowcaseProps) {
 				url="https://www.youtube.com/watch?v=Anae1TPI5VY"
 				title="My 2024 talk for the Triangle Devs meetup"
 				image="/images/showcase/triangle-talk.png"
+				imageAlt="A slide deck showing a flowchart with various changeset representations being ordered in time by clients and servers independently"
 				description="I dig into how local-first works, my approach to migrating databases, and my hopes for sustainable software"
 			/>
 			<ShowcaseItem

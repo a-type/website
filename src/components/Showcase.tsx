@@ -11,12 +11,14 @@ export function Showcase({ children }: ShowcaseProps) {
 
 export function ShowcaseItem({
 	image,
+	imageAlt,
 	title,
 	url,
 	children,
 	description,
 }: {
 	image?: string;
+	imageAlt?: string;
 	title: string;
 	url: string;
 	children?: ReactNode;
@@ -28,11 +30,16 @@ export function ShowcaseItem({
 		>
 			{image && (
 				<Card.Image asChild>
-					<img src={image} className="w-full h-full object-cl" />
+					<img src={image} className="w-full h-full object-cl" alt={imageAlt} />
 				</Card.Image>
 			)}
 			<Card.Main asChild className="flex-[1_0_auto]">
-				<a rel="noopener noreferrer" target="_blank" href={url}>
+				<a
+					rel="noopener noreferrer"
+					target="_blank"
+					href={url}
+					aria-label={title}
+				>
 					<Card.Title className="font-light mb-auto flex-shrink-0">
 						{title}
 					</Card.Title>
