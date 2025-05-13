@@ -47,7 +47,10 @@ export function ShowcaseItem({
 }) {
 	return (
 		<Card
-			className={clsx('border-default	h-auto group', image ? 'aspect-4/3' : '')}
+			className={clsx(
+				'border-default	h-auto group',
+				image ? 'aspect-3/4 sm:aspect-4/3' : '',
+			)}
 		>
 			{image && (
 				<Card.Image asChild>
