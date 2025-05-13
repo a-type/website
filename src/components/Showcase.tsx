@@ -23,7 +23,7 @@ export function ShowcaseItem({
 	description?: string;
 }) {
 	return (
-		<Card className={clsx('border-default	', image ? 'aspect-16/9' : '')}>
+		<Card className={clsx('border-default	h-auto', image ? 'aspect-16/9' : '')}>
 			{image && (
 				<Card.Image asChild>
 					<img src={image} className="w-full h-full" />
