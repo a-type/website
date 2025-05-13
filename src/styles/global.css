@@ -24,6 +24,10 @@
 	font-display: swap;
 }
 
+.font-fancy {
+	font-family: 'Cormorant', serif;
+}
+
 body {
 	font-family: Inter, Arial, Helvetica, sans-serif;
 	margin: 0;
