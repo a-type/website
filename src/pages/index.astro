@@ -3,10 +3,10 @@ import BaseHead from '../components/BaseHead.astro';
 import ExternalLink from '../components/ExternalLink.astro';
 import Footer from '../components/Footer.astro';
 import { MainShowcase, OldShowcase } from '../components/HomepageShowcases';
-import { Links } from '../components/Links';
 import { JobNote } from '../components/JobNote';
+import { Links } from '../components/Links';
 
-import { Box, Button, ColorModeToggle, H1, H2, Icon, Note, P, Provider } from '@a-type/ui';
+import { Box, ColorModeToggle, H1, H2, P, Provider } from '@a-type/ui';
 
 import '@a-type/ui/main.css';
 
@@ -24,12 +24,12 @@ import { SITE_DESCRIPTION, SITE_TITLE } from '../config';
         <Box d="col" gap p className="flex-shrink-1 flex-basis-200px flex-grow-[1]">
           <H1 className="font-fancy italic font-light text-3xl md:text-4xl">{SITE_TITLE}</H1>
           <P className="text-xs color-gray-dark leading-loose">
-            got started in enterprise dashboards, moonlit in <ExternalLink
+            got started in <b>design systems</b>, moonlit in <b><ExternalLink
               href="https://github.com/a-type?tab=repositories&type=source"
               >open source</ExternalLink
-            >, and then jumped straight into <ExternalLink
+            ></b>, and then jumped straight into <b><ExternalLink
               href="https://popspace.io">spatial canvas</ExternalLink
-            >. now I'm working on local-first web apps and other B2C moonshot ideas.
+            ></b>. now I'm working on local-first web apps and other moonshot ideas.
           </P>
           <Links className="gap-sm"/>
           <ColorModeToggle client:load className="mr-auto p-xs" />
