@@ -23,10 +23,12 @@ export function ShowcaseItem({
 	description?: string;
 }) {
 	return (
-		<Card className={clsx('border-default	h-auto', image ? 'aspect-16/9' : '')}>
+		<Card
+			className={clsx('border-default	h-auto group', image ? 'aspect-4/3' : '')}
+		>
 			{image && (
 				<Card.Image asChild>
-					<img src={image} className="w-full h-full" />
+					<img src={image} className="w-full h-full object-cl" />
 				</Card.Image>
 			)}
 			<Card.Main asChild className="flex-[1_0_auto]">
@@ -35,7 +37,12 @@ export function ShowcaseItem({
 						{title}
 					</Card.Title>
 					{description && (
-						<Card.Content className="bg-wash flex-shrink-0">
+						<Card.Content
+							className={clsx(
+								'bg-wash flex-shrink-0',
+								image && 'opacity-0 group-hover:opacity-100 transition-opacity',
+							)}
+						>
 							{description}
 						</Card.Content>
 					)}
