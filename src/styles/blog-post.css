@@ -18,6 +18,10 @@ caption {
 	font-style: italic;
 }
 
+.post-content {
+	line-height: 1.7;
+}
+
 .post-content a {
 	color: var(--color-primary-dark);
 	text-decoration: underline;
