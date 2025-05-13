@@ -2,7 +2,7 @@
 layout: ../../layouts/BlogPost.astro
 title: Idiosyncratic Engineering
 description: Is it ok to rely on platform behavior?
-pubDate: 2024-08-26
+pubDate: 2025-08-26
 heroImage:
 ---
 
@@ -16,7 +16,7 @@ As I said, not a lot of people seemed to be paying attention to this problem at 
 
 When these moments happen I try to take a breath, step back, and think about the actual behavior of the system versus what I want the system to do. In my head I picture the banner hung behind Lee Byron's desk in the React documentary video, which reads, "You'll Think of Something." Corny and embarrassing, sure, but it helps.
 
-![a still from the React documentary showing Lee sitting at a desk in front of a large black cloth banner embroidered with the words "You'll Think of Something" in white block letters](/images/idiosyncratic-engeering/youll-think-of-something.png)
+![a still from the React documentary showing Lee sitting at a desk in front of a large black cloth banner embroidered with the words "You'll Think of Something" in white block letters](/images/idiosyncratic-engineering/youll-think-of-something.png)
 
 The most recent of these was this past weekend, and of course it was the migration system I worked so hard on which suddenly felt like it would surely collapse at any moment. But rather than thinking of a new modification to the system to mitigate this newly realized risk, this time the resolution came a bit differently, and now I'm writing a blog post instead of code.
 

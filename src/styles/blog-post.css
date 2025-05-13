@@ -33,6 +33,12 @@ caption {
 	color: var(--color-primary-ink);
 }
 
+.post-content img {
+	max-width: 100%;
+	height: auto;
+	border-radius: 8px;
+}
+
 pre.astro-code {
 	padding: 1rem;
 	border-radius: 0.5rem;

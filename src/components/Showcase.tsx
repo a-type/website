@@ -6,7 +6,28 @@ export interface ShowcaseProps {
 }
 
 export function Showcase({ children }: ShowcaseProps) {
-	return <Card.Grid className="w-full">{children}</Card.Grid>;
+	return (
+		<Card.Grid
+			className="w-full"
+			columns={(width) => {
+				if (width > 2000) {
+					return 5;
+				}
+				if (width > 1400) {
+					return 4;
+				}
+				if (width > 800) {
+					return 3;
+				}
+				if (width > 300) {
+					return 2;
+				}
+				return 1;
+			}}
+		>
+			{children}
+		</Card.Grid>
+	);
 }
 
 export function ShowcaseItem({
