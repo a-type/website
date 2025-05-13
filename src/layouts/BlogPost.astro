@@ -15,11 +15,12 @@ export interface Props {
     updatedDate?: string;
     heroImage?: string;
     heroCredit?: string;
+    backLink?: '/blog' | '/'
   };
 }
 
 const {
-  content: { title, description, pubDate, updatedDate, heroImage, heroCredit },
+  content: { title, description, pubDate, updatedDate, heroImage, heroCredit, backLink },
 } = Astro.props;
 ---
 
@@ -94,7 +95,7 @@ const {
       }
       <hr />
       <slot />
-      <a href="/blog">← All posts</a>
+      <a href={`${backLink || '/blog'}`}>← All posts</a>
     </article>
   </Main>
   <Footer />

@@ -33,10 +33,22 @@ caption {
 	color: var(--color-primary-ink);
 }
 
-.post-content img {
+.post-content img,
+.post-content video {
 	max-width: 100%;
 	height: auto;
 	border-radius: 8px;
+}
+
+.post-content figure {
+	margin: 0 auto;
+	text-align: center;
+}
+.post-content figure figcaption {
+	font-size: 0.8rem;
+	color: var(--color-primary-ink);
+	margin: 0.5rem 0;
+	font-style: italic;
 }
 
 pre.astro-code {

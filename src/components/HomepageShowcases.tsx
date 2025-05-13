@@ -21,7 +21,7 @@ export function MainShowcase({}: MainShowcaseProps) {
 				description="Local-first data and sync framework"
 			/>
 			<ShowcaseItem
-				url="https://alef.io"
+				url="/projects/alef"
 				image="/images/showcase/alef.png"
 				imageAlt="A capture from within an AR headset of a realspace room with virtual furniture models laid out within, and a floating menu"
 				title="Alef"

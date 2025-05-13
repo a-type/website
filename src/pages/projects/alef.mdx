@@ -1,0 +1,54 @@
+---
+title: 'Alef'
+pubDate: '2025-05-1'
+layout: '../../layouts/BlogPost.astro'
+backLink: '/'
+---
+
+<a href="https://alef.io">
+	Visit Alef (Link may break, eventually)
+</a>
+
+Alef is an augmented reality furniture staging and room planning app I led development for as part of Volumetrics. Users don an AR-capable headset, like the Quest 3, and drop photorealistic and well-lit furniture into their space to see how it looks.
+
+Alef supports robust e-commerce-style inventory management, multiple layouts with quick-change loading, and intuitive gesture-based control.
+
+<figure>
+	<video src="/videos/alef-demo-1-compressed.mp4" autoplay loop muted></video>
+	<figcaption>The in-headset furniture placement experience</figcaption>
+</figure>
+
+<figure>
+	<video src="/videos/alef-editor.mp4" autoplay loop muted></video>
+	<figcaption>The desktop room editor</figcaption>
+</figure>
+
+
+## My role
+
+As the lead engineer at Volumetrics, I was responsible for top-to-bottom architecture and delivery. Within a span of about 3 months, I built out our Cloudflare-powered backend, realtime sync between devices, 3D model uploading and processing, user authentication, and payment processing. On the frontend side, I laid the groundwork for the React-based ThreeJS functionality, connected client-side state to our API with a mini-SDK for efficient reactivity at 90+ FPS, and was responsible for the entire 2D UI and design system.
+
+<figure>
+<video src="/videos/alef-admin.mp4" autoplay loop muted></video>
+<figcaption>The admin furniture management tool automatically processes and screenshots bulk-uploaded models</figcaption>
+</figure>
+
+## Design and implementation
+
+I built Alef on Cloudflare, my first outing with their stack. After assessing our initial product needs, which included serving large high-quality 3D assets and realtime collaborative editing, I decided Cloudflare's billable bandwidth model (with free egress) and its unique offering of Durable Objects was a great fit. I wasn't disappointed!
+
+Each "Property" (which may consist of several rooms) is represented by a Durable Object, and devices connect via Websockets to display and modify the contents of each room. I used D1 to store core application data, like user accounts and organizations, as well as metadata for furniture model assets, which feature a tagging system for rich filter queries.
+
+Since multi-device use cases were important to the product, I also created multiple low-friction ways for users to pair new devices to their accounts, including both local network discovery (a la Spotify casting) and secure code-based pairing.
+
+## Unique challenges
+
+One of the biggest learning curves in this project was AR. I'm pretty familiar with 3D simulation and the geometry involved, but adding a fully free-moving user reference point in the form of a headset actually makes things quite a bit more complicated. To support all manner of AR-powered device formats, including phones and eventually glasses, WebXR has abstracted spatial positioning and viewpoint as "reference spaces." In XR, everything is relative to one of these dynamic spaces -- there is no "world" orientation to rely on.
+
+This presented particular challenges when we developed the desktop editor alongside the in-headset experience. We wanted to magically capture the user's real room shape and seamlessly represent it on their phone or laptop as they go. Doing this was harder than simply storing all the planes provided by the WebXR runtime, because the headset has no delineation between planes in separate rooms.
+
+![Two virtual rooms, one colored green and the other blue](/images/projects/alef/plane-debug.png)
+
+This screenshot shows a rendering of all the planes detected by my headset in my office. The green room is the office itself, but the headset 'remembers' my living room area as well. Coming up with the right 'coloring' algorithm required building visual debugging tools like the above to clearly represent the otherwise invisible XR planes as the device detects them, and reason about edge cases and problems as we went along.
+
+Getting this right across more than just one type of AR device required thoughtful abstractions for very ambiguous spatial data. Our solution was to use heuristics to detect the 'primary floor' and encode all other planes relative to this, using additional algorithms to decide which floor each plane belongs to.
