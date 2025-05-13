@@ -28,8 +28,8 @@ const posts = (await Astro.glob('./*.{md,mdx}'))
   </head>
   <body>
     <Header />
-    <Provider client:load>
-      <Box p="lg" gap d="col" full>
+    <Provider disableParticles client:load>
+      <Box p="lg" gap d="col" full="width">
         <BlogPosts posts={posts} client:load />
     </Box>
     </Provider>

@@ -19,7 +19,7 @@ import { SITE_DESCRIPTION, SITE_TITLE } from '../config';
     <BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
   </head>
   <body class="bg-gray-light" >
-    <Provider client:load>
+    <Provider disableParticles client:load>
       <Box d={{ default: 'col', md: 'row' }} gap p>
         <Box d="col" gap p className="flex-shrink-1 flex-basis-200px flex-grow-[1]">
           <H1 className="font-fancy italic font-light text-3xl md:text-4xl">{SITE_TITLE}</H1>
