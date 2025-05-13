@@ -68,7 +68,7 @@ export function ShowcaseItem({
 						<Card.Content
 							className={clsx(
 								'bg-wash flex-shrink-0',
-								image && 'opacity-0 group-hover:opacity-100 transition-opacity',
+								// image && 'opacity-0 group-hover:opacity-100 transition-opacity',
 							)}
 						>
 							{description}

@@ -34,16 +34,6 @@ export function MainShowcase({}: MainShowcaseProps) {
 				imageAlt="A slide deck showing a flowchart with various changeset representations being ordered in time by clients and servers independently"
 				description="I dig into how local-first works, my approach to migrating databases, and my hopes for sustainable software"
 			/>
-			<ShowcaseItem
-				url="https://youtu.be/TH-78-I6Eh0?list=PLTbD2QA-VMnXFsLbuPGz1H-Najv9MD2-H&t=82"
-				title="My 2023 talk for the local-first web community"
-				description="I describe my experience making local-first tooling and getting apps to market"
-			/>
-			<ShowcaseItem
-				url="https://a-type.github.io/calendar-blocks/"
-				title="Calendar Blocks"
-				description="A set of flexible primitives for React date pickers"
-			/>
 		</Showcase>
 	);
 }
@@ -53,6 +43,11 @@ export interface OldShowcaseProps {}
 export function OldShowcase({}: OldShowcaseProps) {
 	return (
 		<Showcase>
+			<ShowcaseItem
+				url="https://youtu.be/TH-78-I6Eh0?list=PLTbD2QA-VMnXFsLbuPGz1H-Najv9MD2-H&t=82"
+				title="My 2023 talk for the local-first web community"
+				description="I describe my experience making local-first tooling and getting apps to market"
+			/>
 			<ShowcaseItem
 				url="/projects/volu"
 				title="Volu"
@@ -64,6 +59,8 @@ export function OldShowcase({}: OldShowcaseProps) {
 				url="https://popspace.io"
 				title="PopSpace"
 				description="Online spatial meeting spaces. A prior startup."
+				image="/images/showcase/popspace.png"
+				imageAlt="A 2d canvas space with little floating video feeds and avatars, screen shares, and files dropped on it"
 			>
 				<Button asChild size="small" color="ghost">
 					<a
@@ -75,6 +72,11 @@ export function OldShowcase({}: OldShowcaseProps) {
 					</a>
 				</Button>
 			</ShowcaseItem>
+			<ShowcaseItem
+				url="https://a-type.github.io/calendar-blocks/"
+				title="Calendar Blocks"
+				description="A set of flexible primitives for React date pickers"
+			/>
 			<ShowcaseItem
 				url="/projects/subway"
 				title="Lo-fi subway sketch"
