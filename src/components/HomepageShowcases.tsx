@@ -7,13 +7,6 @@ export function MainShowcase({}: MainShowcaseProps) {
 	return (
 		<Showcase>
 			<ShowcaseItem
-				url="/projects/rout"
-				image="/images/showcase/rout.png"
-				imageAlt="The image is blurred, but you can make out a purple background and white text overlaid"
-				title="(coming soon)"
-				imagePosition="center"
-			/>
-			<ShowcaseItem
 				url="https://biscuits.club"
 				image="https://biscuits.club/og-image.png"
 				imageAlt="A phone running a grocery list app, with the title 'Biscuits' and tagline 'Scratch-Made Apps'"
@@ -45,6 +38,13 @@ export function MainShowcase({}: MainShowcaseProps) {
 				url="/blog/lofi-intro"
 				title="Blog series: making a local-first framework"
 				description="A deep dive into the goals, challenges, and implementation of Verdant"
+			/>
+			<ShowcaseItem
+				url="/projects/rout"
+				image="/images/showcase/rout.png"
+				imageAlt="The image is blurred, but you can make out a purple background and white text overlaid"
+				title="(coming soon)"
+				imagePosition="center"
 			/>
 		</Showcase>
 	);
