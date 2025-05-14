@@ -42,4 +42,7 @@ body {
 	--dyn-primary-hue-rotate: 4;
 	--dyn-accent-source: 90;
 	--dyn-accent-hue-rotate: 6;
+
+	--image-primary: sepia(100%) hue-rotate(90deg) saturate(50%)
+		brightness(calc(75% + var(--dyn-mode-sign) * 25%));
 }

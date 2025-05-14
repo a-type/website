@@ -40,6 +40,11 @@ export function MainShowcase({}: MainShowcaseProps) {
 				description="A deep dive into the goals, challenges, and implementation of Verdant"
 			/>
 			<ShowcaseItem
+				url="/projects/design-system"
+				title="My personal design system"
+				description="An experimental and idiosyncratic library I use in all my side-projects"
+			/>
+			<ShowcaseItem
 				url="/projects/rout"
 				image="/images/showcase/rout.png"
 				imageAlt="The image is blurred, but you can make out a purple background and white text overlaid"

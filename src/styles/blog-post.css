@@ -6,8 +6,7 @@
 	border-bottom: 1px solid #ddd;
 	aspect-ratio: 16/9;
 	width: 100%;
-	filter: sepia(100%) hue-rotate(90deg) saturate(50%)
-		brightness(calc(75% + var(--dyn-mode-sign) * 25%));
+	filter: var(--image-primary);
 	opacity: 0.9;
 }
 
@@ -20,6 +19,9 @@ caption {
 
 .post-content {
 	line-height: 1.7;
+	display: flex;
+	flex-direction: column;
+	align-items: start;
 }
 
 .post-content a {

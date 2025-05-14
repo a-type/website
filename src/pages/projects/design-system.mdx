@@ -1,0 +1,91 @@
+---
+title: My design system
+layout: ../../layouts/BlogPost.astro
+pubDate: 2025-5-14
+backLink: /
+---
+
+My personal design system is less a single, concerted effort, and more a naturally evolving toolkit collected from my many, many side-projects.
+
+I started collecting components into a common library when I began working on [Gnocchi](https://gnocchi.biscuits.club), my grocery list app. Gnocchi was the testbed for [Verdant](https://verdant.dev), the local-first data framework I created, but I knew if the experiment was successful I would want to make more apps (and [I have](https://biscuits.club)). It seemed like a good time to start standardizing my approach to UI so I could spend more effort on the products themselves.
+
+<iframe src="/projects/design-system/sampler" className="border-default rounded-md aspect-9/18 max-h-80vh h-auto w-auto mx-auto my-lg" />
+
+I used to be a skeptic about atomic CSS, a la Tailwind. But the highly dynamic needs of my personal experimental projects won me around to it. I became particularly enamored with [UnoCSS](https://unocss.dev): a meta-Tailwind if you will, which lets you build your own atomic class names, variants, etc. It's incredibly powerful! I used a highly customized Tailwind 3 as the baseline of my system.
+
+## Tokens
+
+Half the fun of a design system is token opinions. Do colors have names, or roles? How do you express color scales? What do variants look like? I tend to approach this pretty flexibly and vibes-based (this is great for a personal design system, not necessarily the approach I'd take on a team).
+
+I wanted to keep things very simple and pared-back, so I opted for a handful of color scales: `gray`, `primary`, `accent`, and `attention`. Basically, two colors and red. I like "attention" over "error" since I also usually end up using red for things like notification dots. It signals "rare, but important."
+
+I began with full 12-value color ranges, but this quickly devolved into an inconsistent mess and required me to make too many decisions on the ground: do I use `gray-7` or `gray-8`? It felt too arbitrary!
+
+So I switched over to a smaller, named color grading: `wash`, `light`, `default`, `dark`, `ink`. These provide plenty of space without requiring me to think too much about which to use.
+
+## Dark mode
+
+I failed to include dark mode in my first iteration, which led to some more work later on. But it also made me want to do it with as little work as possible, so that might have ended up being a good call.
+
+At first I just wrote a bit of logic to reverse the underlying color palettes and select particular start and end ranges for each mode (so light might be 20-90, and dark is 80-10, or something like that). This got me a long ways and didn't feel too over-engineered.
+
+But then, I found my real white whale...
+
+## Fully dynamic ... everything
+
+I started learning about CSS color functions and got hold of an idea I couldn't let go of: what if I could construct the entire system from a handful of colors and values? The idea of supplying just a single seed `primary` color and getting a UI with proper application and contrast was very appealing.
+
+And so I began reworking the colors to utilize the `oklch` color space to compute their grading. OKLAB colors helped make all color variants appear similarly light and dark, so I wouldn't have to do any additional tweaking for purple versus yellow.
+
+While I was at it, I defined configurable source variables for things like border thickness, corner radius, and spacing, too.
+
+<video autoplay muted loop src="/videos/design-system.mp4"></video>
+
+After all, if your design system can't do this, what's the point?
+
+## Some other cool tricks
+
+As I explored adaptability, I found a few neat things I could build into my atomic styling:
+
+### Dynamic lighten/darken
+
+5 color values is enough for most cases, but occasionally I want to make one `wash` background stand out just a little against another `wash` background. Or maybe I want the slightest bit of lightening when you hover a button.
+
+These edge cases are what I assume drive most people to adopt a finer-grained gradient, but there's another option: ad-hoc lightening or darkening of an existing color grade.
+
+Using my dynamic color variables and CSS color functions, I added `lighten-#` and `darken-#` classes to my system. They work with the main color properties (`bg`, `color`, and `border`) and lighten or darken the existing selected color in steps. I accomplish this by defining a [non-inherited](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_cascading_variables/Using_CSS_custom_properties#using_property_to_control_inheritance) property for the altered color that overrides the color set by the base class.
+
+So, `color-primary` applies properties like so:
+
+```css
+color: var(--v-color-altered, var(--v-color));
+--v-color: var(--color-primary);
+```
+
+And `color-lighten-1` does something like:
+
+```css
+--v-color-altered: oklch(from var(--v-color) calc(l + 1) c h);
+```
+
+(But a bit more complicated color-wise).
+
+### Finally, a way to inherit from a separate property
+
+This is a bit niche, but I occasionally find a reason to want to inherit one color property from a separate property from a parent. As far as I know there's no way to do this.
+
+But by making `--v-color`, `--v-background`, and `--v-border` inheritable, now I can inherit `color` from `background`, or `border` from `color` (ok, you could do this one with `currentColor`, but now it's more explicit).
+
+I use this to match a shadow to its parent background when doing things like scroll shadows. Otherwise, you have to manually align your scroll container's shadow color with whatever content background it contains, which is easy to get wrong. Now I don't have to configure anything.
+
+## Fun stuff
+
+Because this is my personal design system, I can incorporate pretty much anything I want. For the heck of it, I added a particle system. You can see it in play when opening a dialog, which scatters some 'dust' into the air. I wouldn't say I use it a lot (that would be annoying) but it's great for microinteractions and nice to have in the toolbox.
+
+## The payoff
+
+I do a lot of side projects! And I love having the consistency and familiarity of a personal design system, but I don't want them all to look identical, either.
+
+By making a system that's adaptable, I can reuse it everywhere and still craft independent product identities. (I use it for this website, too).
+
+Plus, every time I add a new component or upgrade existing ones, all my apps benefit at once!
