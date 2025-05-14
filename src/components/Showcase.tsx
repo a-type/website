@@ -37,6 +37,7 @@ export function ShowcaseItem({
 	url,
 	children,
 	description,
+	imagePosition,
 }: {
 	image?: string;
 	imageAlt?: string;
@@ -44,6 +45,7 @@ export function ShowcaseItem({
 	url: string;
 	children?: ReactNode;
 	description?: string;
+	imagePosition?: 'left' | 'center';
 }) {
 	return (
 		<Card
@@ -54,7 +56,14 @@ export function ShowcaseItem({
 		>
 			{image && (
 				<Card.Image asChild>
-					<img src={image} className="w-full h-full object-cl" alt={imageAlt} />
+					<img
+						src={image}
+						className={clsx(
+							'w-full h-full',
+							imagePosition === 'center' ? 'object-c' : 'object-cl',
+						)}
+						alt={imageAlt}
+					/>
 				</Card.Image>
 			)}
 			<Card.Main asChild className="flex-[1_0_auto]">

@@ -7,6 +7,13 @@ export function MainShowcase({}: MainShowcaseProps) {
 	return (
 		<Showcase>
 			<ShowcaseItem
+				url="/projects/rout"
+				image="/images/showcase/rout.png"
+				imageAlt="The image is blurred, but you can make out a purple background and white text overlaid"
+				title="(coming soon)"
+				imagePosition="center"
+			/>
+			<ShowcaseItem
 				url="https://biscuits.club"
 				image="https://biscuits.club/og-image.png"
 				imageAlt="A phone running a grocery list app, with the title 'Biscuits' and tagline 'Scratch-Made Apps'"
@@ -34,6 +41,11 @@ export function MainShowcase({}: MainShowcaseProps) {
 				imageAlt="A slide deck showing a flowchart with various changeset representations being ordered in time by clients and servers independently"
 				description="I dig into how local-first works, my approach to migrating databases, and my hopes for sustainable software"
 			/>
+			<ShowcaseItem
+				url="/blog/lofi-intro"
+				title="Blog series: making a local-first framework"
+				description="A deep dive into the goals, challenges, and implementation of Verdant"
+			/>
 		</Showcase>
 	);
 }
@@ -54,6 +66,7 @@ export function OldShowcase({}: OldShowcaseProps) {
 				description="An in-headset WebXR development environment"
 				image="/images/showcase/volu.png"
 				imageAlt="A code editor with a preview window showing a 3D cloud model"
+				imagePosition="center"
 			/>
 			<ShowcaseItem
 				url="https://popspace.io"
@@ -62,12 +75,12 @@ export function OldShowcase({}: OldShowcaseProps) {
 				image="/images/showcase/popspace.png"
 				imageAlt="A 2d canvas space with little floating video feeds and avatars, screen shares, and files dropped on it"
 			>
-				<Button asChild size="small" color="ghost">
+				<Button asChild size="small" color="accent">
 					<a
 						href="https://www.loom.com/share/3c010e7b79114695a5b356579aafb1b7?sid=6ea72b48-af76-4b4d-94cb-2ba38f9f4ad1"
 						target="_blank"
 					>
-						Video
+						Overview video
 						<Icon name="new_window" />
 					</a>
 				</Button>
@@ -83,6 +96,7 @@ export function OldShowcase({}: OldShowcaseProps) {
 				description="A WebGL subway animation I made for Verdant's previous incarnation"
 				image="/images/showcase/subway.png"
 				imageAlt="A view down the subway, kind of PS2-level graphics, with film grain and depth of field"
+				imagePosition="center"
 			/>
 			<ShowcaseItem
 				url="/projects/clouds"
