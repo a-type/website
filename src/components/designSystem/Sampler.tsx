@@ -5,10 +5,13 @@ import {
 	Card,
 	cardGridColumns,
 	Checkbox,
+	Collapsible,
+	DateRangePicker,
 	Dialog,
 	DropdownMenu,
 	FieldLabel,
-	H3,
+	H4,
+	HorizontalList,
 	Icon,
 	Input,
 	NavBar,
@@ -17,6 +20,7 @@ import {
 	PageNav,
 	PageRoot,
 	Provider,
+	Select,
 	Slider,
 	Switch,
 	Tooltip,
@@ -29,7 +33,7 @@ export interface SamplerProps {}
 
 export function Sampler({}: SamplerProps) {
 	const [primaryHue, setPrimaryHue] = useState(90);
-	const [saturation, setSaturation] = useState(1);
+	const [saturation, setSaturation] = useState(0.5);
 	const [borderScale, setBorderScale] = useState(1);
 	const [cornerScale, setCornerScale] = useState(1);
 
@@ -71,79 +75,110 @@ export function Sampler({}: SamplerProps) {
 								</DropdownMenu.Content>
 							</DropdownMenu>
 						</Box>
-						<Box surface gap d="col">
-							<H3>Theme</H3>
-							<P className="text-xs">
-								Try these sliders to see how much the look and feel can change
-							</P>
-							<Box d="col">
-								<FieldLabel>Primary color</FieldLabel>
-								<Slider
-									color="primary"
-									value={[primaryHue]}
-									onValueChange={([v]) => setPrimaryHue(v)}
-									min={0}
-									max={360}
-									step={1}
-								/>
-							</Box>
-							<Box d="col">
-								<FieldLabel>Saturation</FieldLabel>
-								<Slider
-									color="primary"
-									value={[saturation]}
-									onValueChange={([v]) => setSaturation(v)}
-									min={0}
-									max={1}
-									step={0.1}
-								/>
-							</Box>
-							<Box d="col">
-								<FieldLabel>Border width</FieldLabel>
-								<Slider
-									color="primary"
-									value={[borderScale]}
-									onValueChange={([v]) => setBorderScale(v)}
-									min={0}
-									max={2}
-									step={0.1}
-								/>
-							</Box>
-							<Box d="col">
-								<FieldLabel>Corner scale</FieldLabel>
-								<Slider
-									color="primary"
-									value={[cornerScale]}
-									onValueChange={([v]) => setCornerScale(v)}
-									min={0}
-									max={2}
-									step={0.1}
-								/>
-							</Box>
-						</Box>
+						<Collapsible>
+							<Collapsible.Trigger asChild>
+								<Box gap items="center" p>
+									<Icon name="chevron" />
+									<H4>Theme</H4>
+								</Box>
+							</Collapsible.Trigger>
+							<Collapsible.Content>
+								<Box surface gap d="col">
+									<P className="text-xs">
+										Try these sliders to see how much the look and feel can
+										change
+									</P>
+									<Box d="col">
+										<FieldLabel>Primary color</FieldLabel>
+										<Slider
+											color="primary"
+											value={[primaryHue]}
+											onValueChange={([v]) => setPrimaryHue(v)}
+											min={0}
+											max={360}
+											step={1}
+										/>
+									</Box>
+									<Box d="col">
+										<FieldLabel>Saturation</FieldLabel>
+										<Slider
+											color="primary"
+											value={[saturation]}
+											onValueChange={([v]) => setSaturation(v)}
+											min={0}
+											max={1}
+											step={0.1}
+										/>
+									</Box>
+									<Box d="col">
+										<FieldLabel>Border width</FieldLabel>
+										<Slider
+											color="primary"
+											value={[borderScale]}
+											onValueChange={([v]) => setBorderScale(v)}
+											min={0}
+											max={2}
+											step={0.1}
+										/>
+									</Box>
+									<Box d="col">
+										<FieldLabel>Corner scale</FieldLabel>
+										<Slider
+											color="primary"
+											value={[cornerScale]}
+											onValueChange={([v]) => setCornerScale(v)}
+											min={0}
+											max={2}
+											step={0.1}
+										/>
+									</Box>
+								</Box>
+							</Collapsible.Content>
+						</Collapsible>
 						<Box gap wrap>
-							<Tooltip content="Hello there">
-								<Button color="primary">Hover me</Button>
-							</Tooltip>
-							<Dialog>
-								<Dialog.Trigger asChild>
-									<Button color="accent">Dialog</Button>
-								</Dialog.Trigger>
-								<Dialog.Content>
-									<Dialog.Title>Dialog</Dialog.Title>
-									<Dialog.Description>
-										This is a dialog. It can be used to display information or
-										ask for user input.
-									</Dialog.Description>
-									<Dialog.Actions>
-										<Dialog.Close />
-									</Dialog.Actions>
-								</Dialog.Content>
-							</Dialog>
-							<Checkbox />
-							<Switch />
-							<Input placeholder="Input" />
+							<H4>Controls</H4>
+							<HorizontalList>
+								<Tooltip content="Hello there">
+									<Button color="primary">Hover me</Button>
+								</Tooltip>
+								<Dialog>
+									<Dialog.Trigger asChild>
+										<Button color="accent">Dialog</Button>
+									</Dialog.Trigger>
+									<Dialog.Content>
+										<Dialog.Title>Dialog</Dialog.Title>
+										<Dialog.Description>
+											This is a dialog. It can be used to display information or
+											ask for user input.
+										</Dialog.Description>
+										<Dialog.Actions>
+											<Dialog.Close />
+										</Dialog.Actions>
+									</Dialog.Content>
+								</Dialog>
+								<Checkbox />
+								<Switch />
+								<Input placeholder="Input" />
+								<Select value="">
+									<Select.Trigger>
+										<Select.Value placeholder="Select" />
+										<Select.Icon />
+									</Select.Trigger>
+									<Select.Content>
+										<Select.Item value="1">Item 1</Select.Item>
+										<Select.Item value="2">Item 2</Select.Item>
+										<Select.Item value="3">Item 3</Select.Item>
+									</Select.Content>
+								</Select>
+							</HorizontalList>
 						</Box>
+						<DateRangePicker
+							onChange={() => {}}
+							value={{
+								start: new Date(),
+								end: new Date(new Date().getTime() + 10 * 24 * 60 * 60 * 1000),
+							}}
+						/>
 						<Card.Grid columns={cardGridColumns.small}>
 							<Card>
 								<Card.Main>
