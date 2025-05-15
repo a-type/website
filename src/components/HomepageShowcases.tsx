@@ -39,11 +39,11 @@ export function MainShowcase({}: MainShowcaseProps) {
 				title="Blog series: making a local-first framework"
 				description="A deep dive into the goals, challenges, and implementation of Verdant"
 			/>
-			<ShowcaseItem
+			{/* <ShowcaseItem
 				url="/projects/design-system"
 				title="My personal design system"
 				description="An experimental and idiosyncratic library I use in all my side-projects"
-			/>
+			/> */}
 			<ShowcaseItem
 				url="/projects/rout"
 				image="/images/showcase/rout.png"
