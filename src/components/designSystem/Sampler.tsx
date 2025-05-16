@@ -25,7 +25,6 @@ import {
 	Switch,
 	Tooltip,
 } from '@a-type/ui';
-import '@a-type/ui/main.css';
 import { useEffect, useState } from 'react';
 import '../../styles/global.css';
 

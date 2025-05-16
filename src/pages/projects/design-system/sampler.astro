@@ -1,5 +1,12 @@
 ---
-import '@a-type/ui/main.css';
+import BaseHead from '../../../components/BaseHead.astro';
 import { Sampler as S } from '../../../components/designSystem/Sampler';
 ---
+<html lang="en-us">
+<head>
+<BaseHead title="Design System Sampler" description="" />
+</head>
+<body>
 <S client:load />
+</body>
+</html>

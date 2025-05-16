@@ -8,6 +8,7 @@ import react from '@astrojs/react';
 // https://astro.build/config
 export default defineConfig({
 	site: 'https://gfor.rest',
+
 	markdown: {
 		shikiConfig: {
 			themes: {
@@ -28,8 +29,12 @@ export default defineConfig({
 		}),
 		sitemap(),
 		react(),
-		UnoCSS({
-			// injectReset: true,
-		}),
+		UnoCSS({}),
 	],
+	vite: {
+		optimizeDeps: {
+			exclude: ['@a-type/ui'],
+			include: ['@a-type/ui > formik'],
+		},
+	},
 });
