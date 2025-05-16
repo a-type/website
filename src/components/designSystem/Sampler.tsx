@@ -77,8 +77,12 @@ export function Sampler({}: SamplerProps) {
 						<Collapsible>
 							<Collapsible.Trigger asChild>
 								<Box gap items="center" p>
-									<Icon name="chevron" />
+									<Icon
+										name="chevron"
+										className="[[data-state:open]>&]:rotate-180 transition-transform"
+									/>
 									<H4>Theme</H4>
+									<Icon name="star" className="ml-auto fill-primary" />
 								</Box>
 							</Collapsible.Trigger>
 							<Collapsible.Content>
