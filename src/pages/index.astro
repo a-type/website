@@ -3,7 +3,6 @@ import BaseHead from '../components/BaseHead.astro';
 import ExternalLink from '../components/ExternalLink.astro';
 import Footer from '../components/Footer.astro';
 import { MainShowcase, OldShowcase } from '../components/HomepageShowcases';
-import { JobNote } from '../components/JobNote';
 import { Links } from '../components/Links';
 
 import { Box, ColorModeToggle, H1, H2, P, Provider } from '@a-type/ui';
@@ -31,7 +30,6 @@ import { SITE_DESCRIPTION, SITE_TITLE } from '../config';
           </P>
           <Links className="gap-sm"/>
           <ColorModeToggle client:load className="mr-auto p-xs" />
-          <JobNote client:load />
         </Box>
         <Box d="col" gap className="flex-grow-[5] flex-basis-600px flex-shrink-1">
           <Box d="col" gap="lg" p surface="wash">
