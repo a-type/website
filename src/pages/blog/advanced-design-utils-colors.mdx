@@ -138,6 +138,8 @@ One of my favorite phenomenon is when a small change to how a system behaves yie
 
 It's kind of like the `border: currentColor` trick, but generalized. I can set any of `color`, `bg`, `border`, `ring`, or `shadow` to any other of those values.
 
+> Note: I use `color` and `fg` interchangeably in these utils; both work, but I find `fg` is less ambiguous when paired with prefixes like `border-color-`--`border-color-color` is silly!
+
 Not only that, but it's the "live" value--meaning, when you hover and it applies `bg-lighten-1`, that lightened color is seamlessly _also_ applied to the border. And if a user of the component overrides `bg`, it will likewise carry over to the border, too. This can also be used for shadows and focus rings.
 
 <div id="border-demo" class="my-lg mx-auto rounded-md bg-primary-wash border-8px border-solid border-color-fg ring-8px ring-color-fg ring-color-lighten-4 color-primary-ink p-md hover:color-lighten-4">
@@ -156,7 +158,7 @@ It turns out this simple trick leads to a lot of expressiveness with styling rul
 
 CSS properties inherit by default, so now any children of elements with these utils applied can know what color, background, and border their parents have.
 
-Which means we can write styles which express adaptable concepts like "border mimics the background color of the parent, but darker," without having to specify actual color tokens and handle all the possible variants.
+Which means we can write styles which express adaptable concepts like "border mimics the background color of the parent, but darker," without having to specify variants or do any user configuration at all.
 
 ```html
 <div class="bg-primary-wash">
