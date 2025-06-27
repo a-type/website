@@ -10,6 +10,10 @@
 	opacity: 0.9;
 }
 
+hr {
+	width: 100%;
+}
+
 caption {
 	font-size: 0.8rem;
 	color: #777;
@@ -30,10 +34,10 @@ caption {
 	text-decoration: underline;
 }
 
-.post-content h2,
-.post-content h3,
-.post-content h4 {
+.post-content h1:not(.title) {
 	color: var(--color-primary-ink);
+	font-size: 2rem;
+	font-weight: 600;
 }
 
 .post-content img,
@@ -52,6 +56,21 @@ caption {
 	color: var(--color-primary-ink);
 	margin: 0.5rem 0;
 	font-style: italic;
+}
+
+p {
+	text-wrap: pretty;
+}
+
+p > code {
+	background-color: var(--color-white);
+	font-size: 0.9em;
+	display: inline-block;
+	padding: 0px 0.75rem;
+	border-radius: 0.5rem;
+	border-width: 1px;
+	border-style: solid;
+	border-color: var(--color-gray-dark);
 }
 
 pre.astro-code {

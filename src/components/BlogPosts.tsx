@@ -9,6 +9,11 @@ export function BlogPosts({ posts }: BlogPostsProps) {
 		<Card.Grid className="w-full">
 			{posts.map((post) => (
 				<Card key={post.url}>
+					{post.frontmatter.heroImage && (
+						<Card.Image
+							style={{ backgroundImage: `url(${post.frontmatter.heroImage})` }}
+						/>
+					)}
 					<Card.Main asChild>
 						<a href={post.url}>
 							<Card.Title>{post.frontmatter.title}</Card.Title>
@@ -24,7 +29,9 @@ export function BlogPosts({ posts }: BlogPostsProps) {
 									)}
 								</time>
 							</Card.Content>
-							<Card.Content>{post.frontmatter.description}</Card.Content>
+							{post.frontmatter.description && (
+								<Card.Content>{post.frontmatter.description}</Card.Content>
+							)}
 						</a>
 					</Card.Main>
 				</Card>

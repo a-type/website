@@ -9,8 +9,8 @@ importers:
   .:
     dependencies:
       '@a-type/ui':
-        specifier: ^2.1.6
-        version: 2.1.6(@types/react-dom@19.1.4(@types/react@19.1.4))(@types/react@19.1.4)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(unocss@66.1.1(postcss@8.5.3)(vite@6.3.5(@types/node@22.15.17)(jiti@2.4.2))(vue@3.5.13(typescript@5.8.3)))
+        specifier: ^2.1.21
+        version: 2.1.21(@types/react-dom@19.1.4(@types/react@19.1.4))(@types/react@19.1.4)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(unocss@66.1.1(postcss@8.5.3)(vite@6.3.5(@types/node@22.15.17)(jiti@2.4.2))(vue@3.5.13(typescript@5.8.3)))
       '@astrojs/mdx':
         specifier: ^4.2.6
         version: 4.2.6(astro@5.7.12(@types/node@22.15.17)(jiti@2.4.2)(rollup@4.40.2)(typescript@5.8.3))
@@ -90,8 +90,8 @@ importers:
 
 packages:
 
-  '@a-type/ui@2.1.6':
-    resolution: {integrity: sha512-c5+u8+31fsuIpsm3qYoyIHQUDPXI99Hx4+kU7dZ0MztsGZ3bs9DD1ZdHsefCSln4/nAww/CDFiBSKHxNSjINcQ==}
+  '@a-type/ui@2.1.21':
+    resolution: {integrity: sha512-6pqv3Jn5hWI3lnOVODhMehO0iqXafYGViifZx8x/vb/QYcwGJ1tqUHpKrNkQf2LE6L4NxzAGS5wYSbPvEMH/Kw==}
     peerDependencies:
       react: ^19
       react-dom: ^19
@@ -3530,7 +3530,7 @@ packages:
 
 snapshots:
 
-  '@a-type/ui@2.1.6(@types/react-dom@19.1.4(@types/react@19.1.4))(@types/react@19.1.4)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(unocss@66.1.1(postcss@8.5.3)(vite@6.3.5(@types/node@22.15.17)(jiti@2.4.2))(vue@3.5.13(typescript@5.8.3)))':
+  '@a-type/ui@2.1.21(@types/react-dom@19.1.4(@types/react@19.1.4))(@types/react@19.1.4)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(unocss@66.1.1(postcss@8.5.3)(vite@6.3.5(@types/node@22.15.17)(jiti@2.4.2))(vue@3.5.13(typescript@5.8.3)))':
     dependencies:
       '@a-type/utils': 1.1.5
       '@radix-ui/react-accordion': 1.2.10(@types/react-dom@19.1.4(@types/react@19.1.4))(@types/react@19.1.4)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
@@ -5243,7 +5243,7 @@ snapshots:
 
   '@unocss/rule-utils@66.0.0':
     dependencies:
-      '@unocss/core': 66.0.0
+      '@unocss/core': 66.1.1
       magic-string: 0.30.17
 
   '@unocss/rule-utils@66.1.1':
