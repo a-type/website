@@ -35,9 +35,8 @@ caption {
 }
 
 .post-content h1:not(.title) {
-	color: var(--color-primary-ink);
 	font-size: 2rem;
-	font-weight: 600;
+	font-weight: 500;
 }
 
 .post-content img,
