@@ -9,8 +9,8 @@ importers:
   .:
     dependencies:
       '@a-type/ui':
-        specifier: ^2.2.0
-        version: 2.2.0(@types/react-dom@19.1.4(@types/react@19.1.4))(@types/react@19.1.4)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(unocss@66.1.1(postcss@8.5.3)(vite@6.3.5(@types/node@22.15.17)(jiti@2.4.2))(vue@3.5.13(typescript@5.8.3)))
+        specifier: ^2.6.2
+        version: 2.6.2(@types/react-dom@19.1.4(@types/react@19.1.4))(@types/react@19.1.4)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(unocss@66.1.1(postcss@8.5.3)(vite@6.3.5(@types/node@22.15.17)(jiti@2.4.2))(vue@3.5.13(typescript@5.8.3)))
       '@astrojs/mdx':
         specifier: ^4.2.6
         version: 4.2.6(astro@5.7.12(@types/node@22.15.17)(jiti@2.4.2)(rollup@4.40.2)(typescript@5.8.3))
@@ -90,8 +90,8 @@ importers:
 
 packages:
 
-  '@a-type/ui@2.2.0':
-    resolution: {integrity: sha512-cAtmJRcHIGMyAcT41JCxNfS0wUX4Gmn/6ntQr8w4ZvhNwUqRKjbqZZNa/rLa40Et30SCJ+7lvzBYffAiNg8bmQ==}
+  '@a-type/ui@2.6.2':
+    resolution: {integrity: sha512-vqzgvNA24xetRgnTTBGNZ0E2qwi1reYrFMgsZeGOFLrVG4y+1lnvSuU8dVdCudlH9L0Mtk5zvaXwKYQaOcEiMw==}
     peerDependencies:
       react: ^19
       react-dom: ^19
@@ -3530,7 +3530,7 @@ packages:
 
 snapshots:
 
-  '@a-type/ui@2.2.0(@types/react-dom@19.1.4(@types/react@19.1.4))(@types/react@19.1.4)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(unocss@66.1.1(postcss@8.5.3)(vite@6.3.5(@types/node@22.15.17)(jiti@2.4.2))(vue@3.5.13(typescript@5.8.3)))':
+  '@a-type/ui@2.6.2(@types/react-dom@19.1.4(@types/react@19.1.4))(@types/react@19.1.4)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(unocss@66.1.1(postcss@8.5.3)(vite@6.3.5(@types/node@22.15.17)(jiti@2.4.2))(vue@3.5.13(typescript@5.8.3)))':
     dependencies:
       '@a-type/utils': 1.1.5
       '@radix-ui/react-accordion': 1.2.10(@types/react-dom@19.1.4(@types/react@19.1.4))(@types/react@19.1.4)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)

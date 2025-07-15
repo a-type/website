@@ -7,95 +7,99 @@ import Header from '../components/Header.astro';
 import Main from '../components/Main.astro';
 
 export interface Props {
-  content: {
-    title: string;
-    description: string;
-    pubDate?: string;
-    updatedDate?: string;
-    heroImage?: string;
-    heroCredit?: string;
-    backLink?: '/blog' | '/'
-  };
+	content: {
+		title: string;
+		description: string;
+		pubDate?: string;
+		updatedDate?: string;
+		heroImage?: string;
+		heroCredit?: string;
+		backLink?: '/blog' | '/';
+	};
 }
 
 const {
-  content: { title, description, pubDate, updatedDate, heroImage, heroCredit, backLink },
+	content: {
+		title,
+		description,
+		pubDate,
+		updatedDate,
+		heroImage,
+		heroCredit,
+		backLink,
+	},
 } = Astro.props;
 ---
 
 <style>
-  .title {
-    font-size: 3em;
-    margin: 0.25em 0 0.5em;
-    font-family: 'Cormorant', serif;
-  }
-  .credit {
-    font-size: 0.6em;
-    margin: 0;
-    font-style: italic;
-    color: #888;
-  }
-  hr {
-    border-top: 1px solid #ddd;
-    margin: 1rem 0;
-  }
-  a {
-    color: var(--color-primary-dark);
-    text-decoration: underline;
-  }
-  body {
-    overflow-x: hidden;
-    overflow-y: auto;
-  }
+	.title {
+		font-size: 3em;
+		margin: 0.25em 0 0.5em;
+		font-family: 'Cormorant', serif;
+	}
+	.credit {
+		font-size: 0.6em;
+		margin: 0;
+		font-style: italic;
+		color: #888;
+	}
+	hr {
+		border-top: 1px solid #ddd;
+		margin: 1rem 0;
+	}
+	a {
+		color: var(--color-primary-dark);
+		text-decoration: underline;
+	}
+	body {
+		overflow-x: hidden;
+		overflow-y: auto;
+	}
 </style>
-<BaseHead title={title} description={description} />
+<BaseHead title={title} description={description} image={heroImage} />
 
 <body>
-  <Header />
-  <Main>
-    <article class="post-content">
-      {
-        heroImage && (
-          <>
-            <img
-              class="hero-image"
-              src={heroImage}
-              alt={heroCredit}
-            />
-            <p class="credit">Photo by {heroCredit}</p>
-          </>
-        )
-      }
-      <h1 class="title">{title}</h1>
-      {
-        pubDate && (
-          <time class="text-xs text-gray-dark italic">
-            {new Date(pubDate).toLocaleDateString('en-us', {
-              year: 'numeric',
-              month: 'short',
-              day: 'numeric',
-            })}
-          </time>
-        )
-      }
-      {
-        updatedDate && (
-          <div>
-            Last updated on{' '}
-            <time>
-              {new Date(updatedDate).toLocaleDateString('en-us', {
-                year: 'numeric',
-                month: 'short',
-                day: 'numeric',
-              })}
-            </time>
-          </div>
-        )
-      }
-      <hr />
-      <slot />
-      <a href={`${backLink || '/blog'}`}>← All posts</a>
-    </article>
-  </Main>
-  <Footer />
+	<Header />
+	<Main>
+		<article class="post-content">
+			{
+				heroImage && (
+					<>
+						<img class="hero-image" src={heroImage} alt={heroCredit} />
+						<p class="credit">Photo by {heroCredit}</p>
+					</>
+				)
+			}
+			<h1 class="title">{title}</h1>
+			{
+				pubDate && (
+					<time class="text-xs text-gray-dark italic">
+						{new Date(pubDate).toLocaleDateString('en-us', {
+							year: 'numeric',
+							month: 'short',
+							day: 'numeric',
+						})}
+					</time>
+				)
+			}
+			{
+				updatedDate && (
+					<div>
+						Last updated on{' '}
+						<time>
+							{new Date(updatedDate).toLocaleDateString('en-us', {
+								year: 'numeric',
+								month: 'short',
+								day: 'numeric',
+							})}
+						</time>
+					</div>
+				)
+			}
+			<hr />
+			<slot />
+			<a href={`${backLink || '/blog'}`}>← All posts</a>
+		</article>
+	</Main>
+	<Footer />
 </body>

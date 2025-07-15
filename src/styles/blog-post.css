@@ -21,6 +21,13 @@ caption {
 	font-style: italic;
 }
 
+blockquote > p {
+	margin: 0;
+}
+blockquote {
+	margin-bottom: 1rem;
+}
+
 .post-content {
 	line-height: 1.7;
 	display: flex;
@@ -37,6 +44,15 @@ caption {
 .post-content h1:not(.title) {
 	font-size: 2rem;
 	font-weight: 500;
+	margin-bottom: 1rem;
+	line-height: 1.2;
+}
+h2,
+h3,
+h4 {
+	line-height: 1.2;
+	margin-bottom: 0.25rem;
+	margin-top: 0;
 }
 
 .post-content img,
@@ -61,7 +77,9 @@ p {
 	text-wrap: pretty;
 }
 
-p > code {
+p code,
+ul code,
+ol code {
 	background-color: var(--color-white);
 	font-size: 0.9em;
 	display: inline-block;
