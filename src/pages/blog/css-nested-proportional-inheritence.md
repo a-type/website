@@ -193,6 +193,12 @@ This also lets you be a little more flexible with how you adjust the nesting fac
 
 You can decide whether to configure this property to be [inheritable or not](https://developer.mozilla.org/en-US/docs/Web/CSS/@property/inherits) -- I'm not sure which behavior is preferable at the moment, but I'm inclined to make it non-inheritable, personally. This would mean you can selectively tighten the nesting up for one element and any further children will resume the normal pattern. But again, not sure yet, inheritance could be good too.
 
+## Safeguards
+
+The best systems are resilient, and I can think of at least one way this spatial hierarchy could fail: too much nesting! Pretty quickly, you'll probably start hitting sub-1-pixel gaps, especially if you use a larger division factor like `1/4`.
+
+It would probably be a good idea to use `max()` to ensure a minimum value for `--ctx-nest` before assigning it. After a certain level of nesting, this would make the hierarchy simply 'turn off' and create uniform spacing. While not "systematic" this is perfectly reasonable behavior as you reach 1-2px. Having _some_ gap is important. Of course, you may want to evaluate why such deep nesting is occurring and whether the system needs to accommodate that more explicitly, or if the nesting itself is wrong.
+
 ## Separate, namespaced nesting contexts
 
 If you want to have multiple independently tracked nesting values, you could namespace your properties and copy the same structure, i.e. `--ctx-foo-nest-mode`/`--ctx-foo-nest-1`/`.nesting-foo` etc. This would let you repeat this nesting proportional value pattern for different semantic uses without overlapping.
