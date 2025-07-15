@@ -57,7 +57,7 @@ Leveraging `@container style()`, we can indeed get this working with a clever tr
 
 Let's jump right to the demo, and then I'll explain.
 
-<iframe height="300" style="width: 100%;" scrolling="no" title="Untitled" src="https://codepen.io/a-type/embed/vENOdYB?default-tab=html%2Cresult" frameborder="no" loading="lazy" allowtransparency="true" allowfullscreen="true">
+<iframe height="300" style="width: 100%;" scrolling="no" title="Untitled" src="https://codepen.io/a-type/embed/vENOdYB?default-tab=result" frameborder="no" loading="lazy" allowtransparency="true" allowfullscreen="true">
   See the Pen <a href="https://codepen.io/a-type/pen/vENOdYB">
   Untitled</a> by Grant Forrest (<a href="https://codepen.io/a-type">@a-type</a>)
   on <a href="https://codepen.io">CodePen</a>.
