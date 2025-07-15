@@ -10,7 +10,7 @@ I wasn't particularly interested in the new CSS [container style queries](https:
 
 But then in the shower this morning the pieces started to fall together for how this feature could finally catch one of my CSS white whales: proportional nesting values!
 
-# Design laws made manifest!
+# The law of spatial hierarchy
 
 If you've ever worked with a designer or studied visual design at all, you know about hierarchy. One of the common rules of spatial hierarchy is that related elements should be closer to one another, and unrelated ones should be further away.
 
