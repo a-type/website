@@ -1,6 +1,6 @@
 ---
 layout: ../../layouts/BlogPost.astro
-title: CSS-Only Nested Proportional Inheritance with container style queries
+title: CSS-only auto spatial hierarchy with container style queries
 description: After shrugging at first I actually found a killer usecase for the new CSS @container style(...)
 pubDate: 2025-07-15
 heroImage: /images/blog/css-inheritance/header.png
