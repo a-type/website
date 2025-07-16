@@ -51,7 +51,7 @@ But in CSS this _doesn't_ work, because this is a property declaration, not an a
 
 And for a long time, that was a dead end. No amount of clever tricks I could think of (e.g. having two different variables) would violate this circular logic. It seemed mathematically impossible with the way CSS is designed.
 
-## What works 'now'
+## What works now
 
 Leveraging `@container style()`, we can indeed get this working with a clever trick.
 
