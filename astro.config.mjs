@@ -1,5 +1,6 @@
 import mdx from '@astrojs/mdx';
 import sitemap from '@astrojs/sitemap';
+import AstroPWA from '@vite-pwa/astro';
 import { defineConfig } from 'astro/config';
 import UnoCSS from 'unocss/astro';
 
@@ -30,6 +31,11 @@ export default defineConfig({
 		sitemap(),
 		react(),
 		UnoCSS({}),
+		AstroPWA({
+			devOptions: {
+				enabled: true,
+			},
+		}),
 	],
 	vite: {
 		optimizeDeps: {

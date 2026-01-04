@@ -7,45 +7,63 @@ import { Links } from '../components/Links';
 
 import { Box, ColorModeToggle, H1, H2, P, Provider } from '@a-type/ui';
 
+import { pwaInfo } from 'virtual:pwa-info';
+
 import { SITE_DESCRIPTION, SITE_TITLE } from '../config';
 ---
 
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en-us">
-  <head>
-    <BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
-  </head>
-  <body class="bg-gray-light" >
-    <Provider disableParticles client:load>
-      <Box d={{ default: 'col', md: 'row' }} gap p>
-        <Box d="col" gap p className="flex-shrink-1 flex-basis-200px flex-grow-[1]">
-          <H1 className="font-fancy italic font-light text-3xl md:text-4xl">{SITE_TITLE}</H1>
-          <P className="text-xs color-gray-dark leading-loose">
-            got started in <b>design systems</b>, moonlit in <b><ExternalLink
-              href="https://github.com/a-type?tab=repositories&type=source"
-              >open source</ExternalLink
-            ></b>, and then jumped straight into <b><ExternalLink
-              href="https://popspace.io">spatial canvas</ExternalLink
-            ></b>. now I'm working on local-first web apps and other moonshot ideas.
-          </P>
-          <Links className="gap-sm"/>
-          <ColorModeToggle client:load className="mr-auto p-xs" />
-        </Box>
-        <Box d="col" gap className="flex-grow-[5] flex-basis-600px flex-shrink-1">
-          <Box d="col" gap="lg" p surface="wash">
-            <Box d="col" gap="sm">
-              <H2>New stuff</H2>
-              <P className="color-gray-dark text-xs">(I stay busy)</P>
-            </Box>
-            <MainShowcase client:load />
-          </Box>
-          <Box d="col" gap="lg" p surface="wash">
-            <H2>Old stuff</H2>
-            <OldShowcase client:load />
-          </Box>
-        </Box>
-      </Box>
-      <Footer />
-    </Provider>
-  </body>
+	<head>
+		<BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
+		{pwaInfo && <Fragment set:html={pwaInfo.webManifest.linkTag} />}
+	</head>
+	<body class="bg-gray-light">
+		<Provider disableParticles client:load>
+			<Box d={{ default: 'col', md: 'row' }} gap p>
+				<Box
+					d="col"
+					gap
+					p
+					className="flex-shrink-1 flex-basis-200px flex-grow-[1]"
+				>
+					<H1 className="font-fancy italic font-light text-3xl md:text-4xl"
+						>{SITE_TITLE}</H1
+					>
+					<P className="text-xs color-gray-dark leading-loose">
+						got started in <b>design systems</b>, moonlit in <b
+							><ExternalLink
+								href="https://github.com/a-type?tab=repositories&type=source"
+								>open source</ExternalLink
+							></b
+						>, and then jumped straight into <b
+							><ExternalLink href="https://popspace.io"
+								>spatial canvas</ExternalLink
+							></b
+						>. now I'm working on local-first web apps and other moonshot ideas.
+					</P>
+					<Links className="gap-sm" />
+					<ColorModeToggle client:load className="mr-auto p-xs" />
+				</Box>
+				<Box
+					d="col"
+					gap
+					className="flex-grow-[5] flex-basis-600px flex-shrink-1"
+				>
+					<Box d="col" gap="lg" p surface="wash">
+						<Box d="col" gap="sm">
+							<H2>New stuff</H2>
+							<P className="color-gray-dark text-xs">(I stay busy)</P>
+						</Box>
+						<MainShowcase client:load />
+					</Box>
+					<Box d="col" gap="lg" p surface="wash">
+						<H2>Old stuff</H2>
+						<OldShowcase client:load />
+					</Box>
+				</Box>
+			</Box>
+			<Footer />
+		</Provider>
+	</body>
 </html>

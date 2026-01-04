@@ -17,6 +17,7 @@ export function Links({ className }: LinksProps) {
 				Mastodon
 			</LinksItem>
 			<LinksItem url="/blog">Blog</LinksItem>
+			<LinksItem url="/util">Utils</LinksItem>
 		</nav>
 	);
 }

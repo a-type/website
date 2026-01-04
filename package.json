@@ -1,5 +1,5 @@
 {
-	"name": "@example/blog",
+	"name": "gfor.rest",
 	"version": "0.0.1",
 	"private": true,
 	"scripts": {
@@ -15,10 +15,10 @@
 		"@astrojs/react": "^4.2.7",
 		"@astrojs/rss": "^4.0.11",
 		"@astrojs/sitemap": "^3.4.0",
+		"@react-spring/three": "9.7.5",
 		"@react-three/drei": "^10.0.7",
 		"@react-three/fiber": "^9.1.2",
 		"@react-three/postprocessing": "^3.0.4",
-		"@react-spring/three": "9.7.5",
 		"@types/react": "19.1.4",
 		"@types/react-dom": "19.1.4",
 		"@unocss/reset": "^66.1.1",
@@ -37,6 +37,7 @@
 	},
 	"devDependencies": {
 		"@types/seedrandom": "^3.0.8",
-		"@types/three": "^0.176.0"
+		"@types/three": "^0.176.0",
+		"@vite-pwa/astro": "^1.2.0"
 	}
 }
