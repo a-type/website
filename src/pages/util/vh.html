@@ -12,6 +12,8 @@
 			.container {
 				display: flex;
 				gap: 2px;
+				position: fixed;
+				top: 0;
 			}
 
 			.line {
@@ -52,6 +54,11 @@
 			.lvh {
 				height: 100lvh;
 			}
+			.abs {
+				position: absolute;
+				top: 0;
+				bottom: 0;
+			}
 		</style>
 	</head>
 	<body>
@@ -60,6 +67,7 @@
 			<div class="line dvh" style="background: #00ff0020">dvh</div>
 			<div class="line svh" style="background: #0000ff20">svh</div>
 			<div class="line lvh" style="background: #9f009f20">lvh</div>
+			<div class="line abs" style="background: #ffff0020">abs</div>
 		</div>
 
 		<div style="height: 200vh"></div>
