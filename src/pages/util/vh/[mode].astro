@@ -82,6 +82,7 @@ export function getStaticPaths() {
 			<div class="line svh" style="background: #0000ff20">svh</div>
 			<div class="line lvh" style="background: #9f009f20">lvh</div>
 			<div class="line vk" style="background: #ffa50020">vk</div>
+			<div id="vv-line" class="line vv" style="background: #00ffff20">vv</div>
 		</div>
 
 		<div style="height: 200vh"></div>
@@ -135,9 +136,11 @@ export function getStaticPaths() {
 
 			const vvWidth = document.getElementById('vv-width')!;
 			const vvHeight = document.getElementById('vv-height')!;
+			const vvLine = document.getElementById('vv-line')!;
 			function updateVV() {
 				vvWidth.textContent = window.visualViewport!.width.toFixed(0);
 				vvHeight.textContent = window.visualViewport!.height.toFixed(0);
+				vvLine.style.height = `${window.visualViewport!.height}px`;
 			}
 			window.visualViewport!.addEventListener('resize', updateVV);
 			updateVV();
