@@ -22,6 +22,8 @@ export function getStaticPaths() {
 		<style>
 			body {
 				margin: 0;
+				background-color: white;
+				color: black;
 			}
 
 			.layout {
@@ -41,6 +43,7 @@ export function getStaticPaths() {
 				display: flex;
 				align-items: center;
 				justify-content: center;
+				white-space: pre;
 			}
 			.line::before,
 			.line::after {
@@ -72,6 +75,27 @@ export function getStaticPaths() {
 			}
 			.vk {
 				height: calc(100dvh - env(keyboard-inset-height));
+			}
+
+			.safe-area {
+				& .vh {
+					height: calc(100vh - env(safe-area-inset-bottom));
+				}
+				& .dvh {
+					height: calc(100dvh - env(safe-area-inset-bottom));
+				}
+				& .svh {
+					height: calc(100svh - env(safe-area-inset-bottom));
+				}
+				& .lvh {
+					height: calc(100lvh - env(safe-area-inset-bottom));
+				}
+				& .vk {
+					height: calc(
+						100dvh -
+							max(env(keyboard-inset-height), env(safe-area-inset-bottom))
+					);
+				}
 			}
 		</style>
 	</head>
@@ -113,10 +137,18 @@ export function getStaticPaths() {
 				<option value="overlays-content">overlays-content</option>
 			</select>
 			<input placeholder="keyboard test" />
-			<label
-				><input type="checkbox" id="vk-toggle" />overlay virtual keyboard</label
-			>
+			<button id="vk-toggle">overlay virtual keyboard</button>
 			<div>VV: <span id="vv-width"></span>x<span id="vv-height"></span></div>
+			<div id="100vh">100VH: 0px</div>
+			<label>
+				<input
+					type="checkbox"
+					onchange="
+						document.body.classList.toggle('safe-area', this.checked);
+					"
+				/>
+				use safe area inset
+			</label>
 		</div>
 
 		<script>
@@ -125,13 +157,17 @@ export function getStaticPaths() {
 				.split('/')
 				.pop();
 
-			const vkToggle = document.getElementById('vk-toggle') as HTMLInputElement;
-			vkToggle.addEventListener('change', () => {
-				if (vkToggle.checked) {
-					(navigator as any).virtualKeyboard.overlaysContent = true;
-				} else {
-					(navigator as any).virtualKeyboard.overlaysContent = false;
-				}
+			const vkToggle = document.getElementById(
+				'vk-toggle',
+			) as HTMLButtonElement;
+			if (!('virtualKeyboard' in navigator)) {
+				vkToggle.disabled = true;
+				vkToggle.textContent = '🚫 no virtual keyboard API';
+			}
+			vkToggle.addEventListener('click', () => {
+				(navigator as any).virtualKeyboard.overlaysContent = true;
+				vkToggle.disabled = true;
+				vkToggle.textContent = '✅ overlaying virtual keyboard';
 			});
 
 			const vvWidth = document.getElementById('vv-width')!;
@@ -144,6 +180,28 @@ export function getStaticPaths() {
 			}
 			window.visualViewport!.addEventListener('resize', updateVV);
 			updateVV();
+
+			const vhDisplay = document.getElementById('100vh')!;
+			function updateVH() {
+				vhDisplay.textContent = `100VH: ${window.innerHeight}px`;
+			}
+			window.addEventListener('resize', updateVH);
+			updateVH();
+
+			const lines = document.querySelectorAll('.line');
+			function updateLine(line: HTMLElement) {
+				line.textContent = `${line.className.replace(
+					'line ',
+					'',
+				)}: \n${line.getBoundingClientRect().height.toFixed(0)}px`;
+			}
+			lines.forEach((line) => {
+				updateLine(line as HTMLElement);
+				const observer = new ResizeObserver(() => {
+					updateLine(line as HTMLElement);
+				});
+				observer.observe(line);
+			});
 		</script>
 	</body>
 </html>
