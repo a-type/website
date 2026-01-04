@@ -48,6 +48,8 @@ export default defineConfig({
 			workbox: {
 				navigateFallback: '/',
 				globPatterns: ['**/*.{css,js,html,svg,png,ico,txt}'],
+				maximumFileSizeToCacheInBytes: 5 * 1024 * 1024,
+				globIgnores: ['**/node_modules/**', '**/bake.png', '**/subway.png'],
 			},
 			devOptions: {
 				enabled: true,
