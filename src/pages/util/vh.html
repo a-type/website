@@ -17,7 +17,7 @@
 				gap: 2px;
 				position: fixed;
 				top: 0;
-				width: 80%;
+				width: 100%;
 			}
 
 			.line {
@@ -58,12 +58,8 @@
 			.lvh {
 				height: 100lvh;
 			}
-			.fix {
-				position: fixed;
-				top: 0;
-				bottom: 0;
-				right: 0;
-				width: 20%;
+			.vk {
+				height: calc(100dvh - env(keyboard-inset-height));
 			}
 		</style>
 	</head>
@@ -73,7 +69,7 @@
 			<div class="line dvh" style="background: #00ff0020">dvh</div>
 			<div class="line svh" style="background: #0000ff20">svh</div>
 			<div class="line lvh" style="background: #9f009f20">lvh</div>
-			<div class="line fix" style="background: #ffff0020">fix</div>
+			<div class="line vk" style="background: #ffa50020">vk</div>
 		</div>
 
 		<div style="height: 200vh"></div>
@@ -95,6 +91,20 @@
 		>
 			I am always forgetting what these are.
 			<input placeholder="keyboard test" />
+			<label
+				><input type="checkbox" id="vk-toggle" />overlay virtual keyboard</label
+			>
 		</div>
+
+		<script>
+			const vkToggle = document.getElementById('vk-toggle');
+			vkToggle.addEventListener('change', () => {
+				if (vkToggle.checked) {
+					navigator.virtualKeyboard.overlaysContent = true;
+				} else {
+					navigator.virtualKeyboard.overlaysContent = false;
+				}
+			});
+		</script>
 	</body>
 </html>
