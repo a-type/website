@@ -6,10 +6,14 @@
 		<title>Viewport Height Reminder</title>
 		<style>
 			body {
-				display: flex;
 				margin: 0;
+			}
+
+			.container {
+				display: flex;
 				gap: 2px;
 			}
+
 			.line {
 				position: relative;
 				top: 0;
@@ -51,10 +55,14 @@
 		</style>
 	</head>
 	<body>
-		<div class="line vh" style="background: #ff000020">vh</div>
-		<div class="line dvh" style="background: #00ff0020">dvh</div>
-		<div class="line svh" style="background: #0000ff20">svh</div>
-		<div class="line lvh" style="background: #9f009f20">lvh</div>
+		<div class="container">
+			<div class="line vh" style="background: #ff000020">vh</div>
+			<div class="line dvh" style="background: #00ff0020">dvh</div>
+			<div class="line svh" style="background: #0000ff20">svh</div>
+			<div class="line lvh" style="background: #9f009f20">lvh</div>
+		</div>
+
+		<div style="height: 200vh"></div>
 
 		<div
 			style="
