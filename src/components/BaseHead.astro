@@ -4,10 +4,13 @@
 import '@a-type/ui/main.css';
 import '../styles/global.css';
 
+import { pwaAssetsHead } from 'virtual:pwa-assets/head';
+import { pwaInfo } from 'virtual:pwa-info';
+
 export interface Props {
-  title: string;
-  description: string;
-  image?: string;
+	title: string;
+	description: string;
+	image?: string;
 }
 
 const { title, description, image = '/placeholder-social.jpg' } = Astro.props;
@@ -16,8 +19,15 @@ const { title, description, image = '/placeholder-social.jpg' } = Astro.props;
 <!-- Global Metadata -->
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<link rel="icon" href="/favicon32.png" />
 <meta name="generator" content={Astro.generator} />
+
+{
+	pwaAssetsHead.themeColor && (
+		<meta name="theme-color" content={pwaAssetsHead.themeColor.content} />
+	)
+}
+{pwaAssetsHead.links.map((link) => <link {...link} />)}
+{pwaInfo && <Fragment set:html={pwaInfo.webManifest.linkTag} />}
 
 <!-- Primary Meta Tags -->
 <title>{title}</title>

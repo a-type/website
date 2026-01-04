@@ -32,8 +32,29 @@ export default defineConfig({
 		react(),
 		UnoCSS({}),
 		AstroPWA({
+			mode: 'development',
+			base: '/',
+			scope: '/',
+			includeAssets: ['favicon.svg'],
+			registerType: 'autoUpdate',
+			manifest: {
+				name: 'gfor.rest',
+				short_name: 'gfor.rest',
+				theme_color: '#ffffff',
+			},
+			pwaAssets: {
+				config: true,
+			},
+			workbox: {
+				navigateFallback: '/',
+				globPatterns: ['**/*.{css,js,html,svg,png,ico,txt}'],
+			},
 			devOptions: {
 				enabled: true,
+				navigateFallbackAllowlist: [/^\/$/],
+			},
+			experimental: {
+				directoryAndTrailingSlashHandler: true,
 			},
 		}),
 	],
