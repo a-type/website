@@ -1,10 +1,22 @@
-<!DOCTYPE html>
+---
+const { mode } = Astro.params;
+
+export function getStaticPaths() {
+	return [
+		{ params: { mode: 'resizes-content' } },
+		{ params: { mode: 'resizes-viewport' } },
+		{ params: { mode: 'overlays-content' } },
+	];
+}
+---
+
+<!doctype html>
 <html lang="en">
 	<head>
 		<meta charset="UTF-8" />
 		<meta
 			name="viewport"
-			content="width=device-width, initial-scale=1.0, interactive-widget=resizes-content"
+			content={`width=device-width, initial-scale=1.0, interactive-widget=${mode}`}
 		/>
 		<title>Viewport Height Reminder</title>
 		<style>
@@ -89,7 +101,16 @@
 				gap: 4px;
 			"
 		>
-			I am always forgetting what these are.
+			<div>Viewport lengths test</div>
+			<select
+				onchange="location.href=`/util/vh/${this.value}`"
+				default-value={mode}
+				id="mode-select"
+			>
+				<option value="resizes-content">resizes-content</option>
+				<option value="resizes-viewport">resizes-viewport</option>
+				<option value="overlays-content">overlays-content</option>
+			</select>
 			<input placeholder="keyboard test" />
 			<label
 				><input type="checkbox" id="vk-toggle" />overlay virtual keyboard</label
@@ -97,12 +118,17 @@
 		</div>
 
 		<script>
-			const vkToggle = document.getElementById('vk-toggle');
+			// @ts-ignore
+			document.getElementById('mode-select').value = window.location.pathname
+				.split('/')
+				.pop();
+
+			const vkToggle = document.getElementById('vk-toggle') as HTMLInputElement;
 			vkToggle.addEventListener('change', () => {
 				if (vkToggle.checked) {
-					navigator.virtualKeyboard.overlaysContent = true;
+					(navigator as any).virtualKeyboard.overlaysContent = true;
 				} else {
-					navigator.virtualKeyboard.overlaysContent = false;
+					(navigator as any).virtualKeyboard.overlaysContent = false;
 				}
 			});
 		</script>
