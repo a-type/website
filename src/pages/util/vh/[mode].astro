@@ -115,6 +115,7 @@ export function getStaticPaths() {
 			<label
 				><input type="checkbox" id="vk-toggle" />overlay virtual keyboard</label
 			>
+			<div>VV: <span id="vv-width"></span>x<span id="vv-height"></span></div>
 		</div>
 
 		<script>
@@ -131,6 +132,15 @@ export function getStaticPaths() {
 					(navigator as any).virtualKeyboard.overlaysContent = false;
 				}
 			});
+
+			const vvWidth = document.getElementById('vv-width')!;
+			const vvHeight = document.getElementById('vv-height')!;
+			function updateVV() {
+				vvWidth.textContent = window.visualViewport!.width.toFixed(0);
+				vvHeight.textContent = window.visualViewport!.height.toFixed(0);
+			}
+			window.visualViewport!.addEventListener('resize', updateVV);
+			updateVV();
 		</script>
 	</body>
 </html>
