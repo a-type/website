@@ -76,6 +76,11 @@ export function getStaticPaths() {
 			.vk {
 				height: calc(100dvh - env(keyboard-inset-height));
 			}
+			.fix {
+				position: fixed;
+				bottom: 0;
+				height: 100vh;
+			}
 
 			.safe-area {
 				& .vh {
@@ -96,6 +101,9 @@ export function getStaticPaths() {
 							max(env(keyboard-inset-height), env(safe-area-inset-bottom))
 					);
 				}
+				& .fix {
+					bottom: env(safe-area-inset-bottom);
+				}
 			}
 		</style>
 	</head>
@@ -105,6 +113,7 @@ export function getStaticPaths() {
 			<div class="line dvh" style="background: #00ff0020">dvh</div>
 			<div class="line svh" style="background: #0000ff20">svh</div>
 			<div class="line lvh" style="background: #9f009f20">lvh</div>
+			<div class="line fix" style="background: #80808020">fix</div>
 			<div class="line vk" style="background: #ffa50020">vk</div>
 			<div id="vv-line" class="line vv" style="background: #00ffff20">vv</div>
 		</div>
