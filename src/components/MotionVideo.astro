@@ -1,0 +1,40 @@
+---
+import { getDynamicThemeForPath } from '../stores/dynamicTheme';
+
+const theme = getDynamicThemeForPath(Astro.routePattern);
+---
+
+<div>
+	<video src={theme.videoSrc} autoplay muted loop data-motion></video>
+</div>
+<style>
+	div {
+		position: absolute;
+		z-index: -1;
+		inset: 0;
+		background-color: var(--m-tint-light);
+	}
+	video {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+		filter: contrast(0.8) brightness(1.5);
+		opacity: 50%;
+	}
+</style>
+<script>
+	import { dynamicTheme } from '../stores/dynamicTheme';
+
+	const video = document.querySelector(
+		'video[data-motion]',
+	) as HTMLVideoElement | null;
+	if (video) {
+		(video as HTMLVideoElement).playbackRate = 0.5;
+	}
+
+	dynamicTheme.subscribe((theme) => {
+		if (video) {
+			video.src = theme.videoSrc;
+		}
+	});
+</script>

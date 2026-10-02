@@ -1,0 +1,37 @@
+---
+export type Props = {
+	class?: string;
+};
+const { class: className, ...rest } = Astro.props;
+---
+
+<div class={className} {...rest}>
+	<canvas data-cloud-canvas class={className}> </canvas>
+</div>
+
+<style>
+	div {
+		width: 100%;
+		height: 100%;
+		position: fixed;
+		inset: 0;
+		z-index: 0;
+	}
+	canvas {
+		position: absolute;
+		bottom: 0;
+		left: 0;
+	}
+</style>
+
+<script>
+	import Cloud from './cloud';
+	const canvases = document.querySelectorAll(
+		'[data-cloud-canvas]',
+	) as NodeListOf<HTMLCanvasElement>;
+	for (const canvas of canvases) {
+		canvas.width = canvas.parentElement!.clientWidth / 2;
+		canvas.height = canvas.parentElement!.clientWidth / 3;
+		Cloud.drawCloud(canvas.getContext('2d')!, {});
+	}
+</script>

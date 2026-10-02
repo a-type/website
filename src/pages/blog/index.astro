@@ -1,37 +1,22 @@
 ---
-import { Box, Provider } from '@a-type/ui';
-import BaseHead from '../../components/BaseHead.astro';
-import { BlogPosts } from '../../components/BlogPosts';
-import Footer from '../../components/Footer.astro';
-import Header from '../../components/Header.astro';
-import { SHOW_FUTURE_POSTS, SITE_DESCRIPTION, SITE_TITLE } from '../../config';
+import { getCollection } from 'astro:content';
+import { SHOW_FUTURE_POSTS } from '../../config';
+import Layout from '../../layouts/MainLayout.astro';
 
 // Use Astro.glob() to fetch all posts, and then sort them by date.
-const posts = (await Astro.glob('./*.{md,mdx}'))
-  .sort(
-    (a, b) =>
-      new Date(b.frontmatter.pubDate).valueOf() -
-      new Date(a.frontmatter.pubDate).valueOf(),
-  )
-  .filter(
-    (post) =>
-      SHOW_FUTURE_POSTS ||
-      new Date(post.frontmatter.pubDate).valueOf() < new Date().getTime(),
-  );
+const posts = (await getCollection('blog'))
+	.sort(
+		(a: any, b: any) =>
+			new Date(b.frontmatter?.pubDate ?? 0).valueOf() -
+			new Date(a.frontmatter?.pubDate ?? 0).valueOf(),
+	)
+	.filter(
+		(post: any) =>
+			SHOW_FUTURE_POSTS ||
+			new Date(post.frontmatter?.pubDate).valueOf() < new Date().getTime(),
+	);
 ---
 
-<!DOCTYPE html>
-<html lang="en-us">
-  <head>
-    <BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
-  </head>
-  <body>
-    <Header />
-    <Provider disableParticles client:load>
-      <Box p="lg" gap d="col" full="width">
-        <BlogPosts posts={posts} client:load />
-    </Box>
-    </Provider>
-    <Footer />
-  </body>
-</html>
+<Layout>
+	<div>TODO</div>
+</Layout>

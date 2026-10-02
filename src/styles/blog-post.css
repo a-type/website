@@ -37,7 +37,7 @@ blockquote {
 }
 
 .post-content a {
-	color: var(--color-primary-ink);
+	color: var(--tint-ink);
 	text-decoration: underline;
 }
 
@@ -68,7 +68,7 @@ h4 {
 }
 .post-content figure figcaption {
 	font-size: 0.8rem;
-	color: var(--color-primary-ink);
+	color: var(--tint-ink);
 	margin: 0.5rem 0;
 	font-style: italic;
 }
@@ -80,14 +80,14 @@ p {
 p code,
 ul code,
 ol code {
-	background-color: var(--color-white);
+	background-color: var(--gray-paper);
 	font-size: 0.9em;
 	display: inline-block;
 	padding: 0px 0.75rem;
 	border-radius: 0.5rem;
 	border-width: 1px;
 	border-style: solid;
-	border-color: var(--color-gray-dark);
+	border-color: var(--gray-heavy);
 }
 
 pre.astro-code {
@@ -128,7 +128,7 @@ html.override-dark .astro-code span {
 }
 
 blockquote {
-	border-left: 4px solid var(--color-primary);
+	border-left: 4px solid var(--tint);
 	padding-left: 1rem;
 	margin: 1rem 1rem;
 }

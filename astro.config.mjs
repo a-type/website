@@ -2,9 +2,6 @@ import mdx from '@astrojs/mdx';
 import sitemap from '@astrojs/sitemap';
 import AstroPWA from '@vite-pwa/astro';
 import { defineConfig } from 'astro/config';
-import UnoCSS from 'unocss/astro';
-
-import react from '@astrojs/react';
 
 // https://astro.build/config
 export default defineConfig({
@@ -29,8 +26,6 @@ export default defineConfig({
 			syntaxHighlight: 'shiki',
 		}),
 		sitemap(),
-		react(),
-		UnoCSS({}),
 		AstroPWA({
 			mode: 'development',
 			base: '/',
@@ -49,7 +44,6 @@ export default defineConfig({
 				navigateFallback: '/',
 				globPatterns: ['**/*.{css,js,html,svg,png,ico,txt}'],
 				maximumFileSizeToCacheInBytes: 5 * 1024 * 1024,
-				globIgnores: ['**/node_modules/**', '**/bake.png', '**/subway.png'],
 			},
 			devOptions: {
 				enabled: true,
@@ -60,10 +54,4 @@ export default defineConfig({
 			},
 		}),
 	],
-	vite: {
-		optimizeDeps: {
-			exclude: ['@a-type/ui'],
-			include: ['@a-type/ui > formik'],
-		},
-	},
 });

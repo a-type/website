@@ -1,0 +1,22 @@
+---
+import { getCollection } from 'astro:content';
+import { SHOW_FUTURE_POSTS } from '../../config';
+import Layout from '../../layouts/MainLayout.astro';
+
+// Use Astro.glob() to fetch all posts, and then sort them by date.
+const posts = (await getCollection('projects'))
+	.sort(
+		(a: any, b: any) =>
+			new Date(b.frontmatter?.pubDate ?? 0).valueOf() -
+			new Date(a.frontmatter?.pubDate ?? 0).valueOf(),
+	)
+	.filter(
+		(post: any) =>
+			SHOW_FUTURE_POSTS ||
+			new Date(post.frontmatter?.pubDate).valueOf() < new Date().getTime(),
+	);
+---
+
+<Layout>
+	<div>TODO</div>
+</Layout>
