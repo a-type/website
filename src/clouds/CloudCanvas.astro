@@ -5,7 +5,7 @@ export type Props = {
 const { class: className, ...rest } = Astro.props;
 ---
 
-<div class={className} {...rest}>
+<div class={className} {...rest} transition:persist="cloud-canvas">
 	<canvas data-cloud-canvas class={className}> </canvas>
 </div>
 
@@ -19,19 +19,78 @@ const { class: className, ...rest } = Astro.props;
 	}
 	canvas {
 		position: absolute;
-		bottom: 0;
-		left: 0;
+		bottom: var(--m-sp-sm);
+		left: var(--m-sp-sm);
 	}
 </style>
 
 <script>
-	import Cloud from './cloud';
-	const canvases = document.querySelectorAll(
-		'[data-cloud-canvas]',
-	) as NodeListOf<HTMLCanvasElement>;
-	for (const canvas of canvases) {
-		canvas.width = canvas.parentElement!.clientWidth / 2;
-		canvas.height = canvas.parentElement!.clientWidth / 3;
-		Cloud.drawCloud(canvas.getContext('2d')!, {});
+	const seeds = new WeakMap<HTMLCanvasElement, number>();
+	const transferMap = new WeakMap<HTMLCanvasElement, OffscreenCanvas>();
+
+	async function runClouds() {
+		const canvases = document.querySelectorAll(
+			'[data-cloud-canvas]',
+		) as NodeListOf<HTMLCanvasElement>;
+		for (const canvas of canvases) {
+			const seed = seeds.get(canvas) ?? Math.random();
+			seeds.set(canvas, seed);
+
+			// cannot set dimensions if already transferred to offscreen
+			if (!transferMap.has(canvas)) {
+				const maxDim = Math.max(
+					canvas.parentElement!.clientWidth,
+					canvas.parentElement!.clientHeight,
+				);
+				canvas.width = maxDim / 2;
+				canvas.height = maxDim / 3;
+			}
+
+			if (
+				typeof Worker === 'function' &&
+				typeof canvas.transferControlToOffscreen === 'function'
+			) {
+				const worker = new Worker(
+					new URL('./cloud.worker.ts', import.meta.url),
+					{
+						type: 'module',
+					},
+				);
+				window.addEventListener('pagehide', (event) => {
+					if (!event.persisted) worker.terminate();
+				});
+				worker.onerror = (event) => {
+					console.error('Cloud worker failed:', event.message);
+					worker.terminate();
+				};
+
+				// cannot transfer more than once
+				if (!transferMap.has(canvas)) {
+					const offscreen = canvas.transferControlToOffscreen();
+					transferMap.set(canvas, offscreen);
+					worker.postMessage(offscreen, [offscreen]);
+				}
+			} else {
+				const { default: Cloud } = await import('./cloud');
+				Cloud.drawCloud(canvas.getContext('2d')!, {
+					seed,
+				});
+			}
+		}
 	}
+
+	await runClouds();
+
+	function debounce<T extends (...args: any[]) => any>(
+		func: T,
+		wait: number,
+	): T {
+		let timeout: number | undefined;
+		return function (this: any, ...args: any[]) {
+			clearTimeout(timeout);
+			timeout = window.setTimeout(() => func.apply(this, args), wait);
+		} as T;
+	}
+
+	window.addEventListener('resize', debounce(runClouds, 800));
 </script>

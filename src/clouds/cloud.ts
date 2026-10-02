@@ -33,10 +33,7 @@ type CloudBounds = {
 };
 
 type CloudRenderer = {
-	drawCloud: (
-		target: CanvasRenderingContext2D,
-		options?: DrawCloudOptions,
-	) => CloudBounds;
+	drawCloud: (target: CanvasContext, options?: DrawCloudOptions) => CloudBounds;
 	fractalCloudLobes: (
 		width: number,
 		height: number,
@@ -60,6 +57,9 @@ type CloudRenderer = {
 const DEFAULT_FILL = '#ffffff';
 const DEFAULT_OUTLINE = '#000000';
 const DEFAULT_SHADOW = '#505050';
+const MARGIN = 4;
+const OUTER_OUTLINE_WIDTH = 2;
+const INNER_OVERLAY_BORDER_WIDTH = 1;
 
 function randomGenerator(seed?: number | null): RandomFn {
 	if (seed === undefined || seed === null) {
@@ -559,7 +559,7 @@ function drawCloud(
 	const settings = options || {};
 	const width = target.canvas.width;
 	const height = target.canvas.height;
-	const floor =
+	let floor =
 		settings.floor === undefined ? round(height * 0.98) : settings.floor;
 	const rootCenterX =
 		settings.rootCenterX === undefined ?
@@ -578,6 +578,28 @@ function drawCloud(
 		seed,
 		sizeMultiplier: settings.sizeMultiplier,
 	});
+	const contourLobes = fractalCloudLobes(width, height, floor, rootCenterX, {
+		seed,
+		sizeMultiplier: 0.92,
+	});
+	const allLobes = [...lobes, ...contourLobes];
+	const horizontalShift = Math.max(
+		0,
+		-Math.min(...allLobes.map((lobe) => lobe.centerX - lobe.radiusX)),
+	);
+	for (const lobe of allLobes) {
+		lobe.centerX += horizontalShift;
+	}
+	const bounds = boundsFor(allLobes, floor);
+	const left = Math.floor(bounds.left) - MARGIN;
+	const top = Math.floor(Math.min(bounds.top, floor - 38)) - MARGIN;
+	target.canvas.width = Math.ceil(bounds.right) - left + MARGIN;
+	target.canvas.height = Math.ceil(bounds.bottom) - top + MARGIN;
+	for (const lobe of allLobes) {
+		lobe.centerX -= left;
+		lobe.centerY -= top;
+	}
+	floor -= top;
 
 	const silhouette = maskCanvas(target);
 	drawMaskShapes(silhouette, lobes, floor);
@@ -601,10 +623,6 @@ function drawCloud(
 		drawMasked(target, cloudFillLayer, upperLobeMask(target, lobe, nodeMask));
 	}
 
-	const contourLobes = fractalCloudLobes(width, height, floor, rootCenterX, {
-		seed,
-		sizeMultiplier: 0.92,
-	});
 	const contourMask = maskCanvas(target);
 	const contourContext = get2dContext(contourMask);
 	contourContext.fillStyle = '#ffffff';
@@ -619,7 +637,11 @@ function drawCloud(
 	drawMasked(
 		target,
 		fillLayer(target, '#323232'),
-		subtractMasks(target, contourMask, minFilter(target, contourMask, 5)),
+		subtractMasks(
+			target,
+			contourMask,
+			minFilter(target, contourMask, INNER_OVERLAY_BORDER_WIDTH * 2 + 1),
+		),
 	);
 
 	let eraseMask = maskCanvas(target);
@@ -648,7 +670,11 @@ function drawCloud(
 	drawMasked(
 		target,
 		outlineLayer,
-		subtractMasks(target, cloudUnion, minFilter(target, cloudUnion, 7)),
+		subtractMasks(
+			target,
+			cloudUnion,
+			minFilter(target, cloudUnion, OUTER_OUTLINE_WIDTH * 2 + 1),
+		),
 	);
 
 	if (settings.debug) {
@@ -663,7 +689,13 @@ function drawCloud(
 		target.restore();
 	}
 
-	return { ...boundsFor(lobes, floor), lobes };
+	return {
+		left: bounds.left - left,
+		top: Math.min(bounds.top, bounds.bottom - 38) - top,
+		right: bounds.right - left,
+		bottom: floor,
+		lobes,
+	};
 }
 
 const CloudAPI: CloudRenderer = {
