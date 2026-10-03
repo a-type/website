@@ -3,7 +3,6 @@ import sitemap from '@astrojs/sitemap';
 import AstroPWA from '@vite-pwa/astro';
 import { defineConfig } from 'astro/config';
 
-// https://astro.build/config
 export default defineConfig({
 	site: 'https://gfor.rest',
 
@@ -42,7 +41,7 @@ export default defineConfig({
 			},
 			workbox: {
 				navigateFallback: '/',
-				globPatterns: ['**/*.{css,js,html,svg,png,ico,txt}'],
+				globPatterns: ['**/*.{css,js,html,ico}'],
 				maximumFileSizeToCacheInBytes: 5 * 1024 * 1024,
 			},
 			devOptions: {
